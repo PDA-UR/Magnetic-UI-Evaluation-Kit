@@ -4,8 +4,8 @@
  * Class to create 2D vectors and perform basic calculations with it.
  */
 function Vector(x, y) {
-    this.x = x || 0;
-    this.y = y || 0;
+    this.x = x;
+    this.y = y;
 }
 
 Vector.prototype.add = function (v) {
