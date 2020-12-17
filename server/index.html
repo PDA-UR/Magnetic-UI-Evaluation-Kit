@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test</title>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    </head>
+</head>
+<body>
+<script>
+    function post() {
+        $.ajax({
+            url: "http://localhost:3333/log/",
+            type: "POST",
+            data: JSON.stringify({"id": 1}),
+            contentType: "application/json",
+            dataType: "json",
+            success: function(data) {
+                alert(data);
+            }
+        });
+    }
+
+    post();
+</script>
+</body>
+</html>
