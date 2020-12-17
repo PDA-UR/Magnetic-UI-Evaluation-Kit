@@ -5,43 +5,54 @@ let rectConfig = {
     width: 100,
     height: 150,
     color: "red",
-    x_pos: 10,
-    y_pos: 20
+    x_pos: 400,
+    y_pos: 200
 };
 
 createRect(rectConfig);
 
-document.body.addEventListener('mousemove', event => {
-    // Returns the horizontal/vertical coordinate of the mouse pointer,
-    // relative to the current window, when the mouse event was triggered
-    moveRect(event.clientX, event.clientY);
-});
+let lastMousePositionX = null,
+    lastMousePositionY = null;
 
+document.body.addEventListener('mousemove', event => {
+    // clientX/clientY: Returns the horizontal/vertical coordinate of the mouse pointer,
+    // relative to the current window, when the mouse event was triggered
+
+    if (lastMousePositionX == null || lastMousePositionY == null) {
+        lastMousePositionX = event.clientX;
+        lastMousePositionY = event.clientY;
+    } else {
+        moveRect(event.clientX, event.clientY);
+    }
+
+});
 
 function moveRect(mouseX, mouseY) {
     let div = document.getElementById(rectConfig.id),
-        mousePosition = new Vector(mouseX, mouseY),
-        rectPosition = new Vector(div.offsetTop, div.offsetLeft), // top-left point of rect!
+        currentPositionX = mouseX,
+        currentPositionY = mouseY;
 
-        connectingVector = mousePosition.subtract(rectPosition),
-        distance = connectingVector.length(),
-        normalized = connectingVector.normalize(),
-        newPoint = rectPosition.add(normalized.multiply(10));
-
-    console.log(distance);
-
+    // todo: choose reasonable distance and implement
     // if (distance > 300) { return; }
+
+    let dx = currentPositionX - lastMousePositionX;
+    let dy = currentPositionY - lastMousePositionY;
+
+    let divTop = parseInt(div.style.top),
+        divLeft = parseInt(div.style.left);
+
 
     if (div.matches(":hover")) {
         //Mouse is inside element
-        return;
+        console.log("inside element");
+    } else {
+        div.style.top = divTop + (-1 * dy) + 'px';
+        div.style.left = divLeft + (-1 * dx) + 'px';
     }
 
-
-    div.style.top = newPoint.x + 'px';
-    div.style.left = newPoint.y + 'px';
+    lastMousePositionX = currentPositionX;
+    lastMousePositionY = currentPositionY;
 }
-
 
 function createRect(config) {
     let div = document.createElement("div");
@@ -52,7 +63,7 @@ function createRect(config) {
     div.style.position = "absolute";
     div.style.left = config.x_pos + 'px';
     div.style.top = config.y_pos + 'px';
-    div.style.transition = '0.2s';
+    // div.style.transition = '0.2s';
 
     document.body.appendChild(div);
 }
