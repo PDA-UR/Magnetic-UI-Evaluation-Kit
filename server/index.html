@@ -13,7 +13,7 @@
         $.ajax({
             url: "http://localhost:3333/log/",
             type: "POST",
-            data: JSON.stringify({"id": 1}),
+            data: JSON.stringify({"data": {"pid": 1, "timestamp": 12121212, "condition": 2}}),
             contentType: "application/json",
             dataType: "json",
             success: function(data) {
