@@ -1,4 +1,4 @@
-from bottle import route, run, request, template
+from bottle import route, run, request, template, TEMPLATE_PATH, static_file
 import csv
 import threading
 
@@ -13,8 +13,16 @@ if __name__ == '__main__':
         log_file.flush()
 
     @route("/")
-    def index():
-        return template("index.html", request=request)
+    def server_static():
+        return static_file("index.html", root='./app/')
+
+    @route('/css/<filename>')
+    def server_static(filename):
+        return static_file(filename, root='./app/res')
+
+    @route('/js/<filename>')
+    def server_static(filename):
+        return static_file(filename, root='./app/res/js')
 
     threading.Thread(target=run(host="localhost", port=3333, debug=False)).start()
 
