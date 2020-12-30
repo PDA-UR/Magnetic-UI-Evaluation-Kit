@@ -16,11 +16,11 @@ if __name__ == '__main__':
     def server_static():
         return static_file("index.html", root='./app/')
 
-    @route('/css/<filename>')
+    @route('/res/<filename>')
     def server_static(filename):
         return static_file(filename, root='./app/res')
 
-    @route('/js/<filename>')
+    @route('/res/js/<filename>')
     def server_static(filename):
         return static_file(filename, root='./app/res/js')
 
