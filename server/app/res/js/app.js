@@ -1,16 +1,12 @@
 /* jshint esversion: 6 */
 
-let rectConfig = {
-    id: "div-test",
-    width: 100,
-    height: 150,
-    color: "red",
-    x_pos: 400,
-    y_pos: 200,
-    name: "redFirst"
-};
+let rectConfig;
+//Get JSON config file from Server
+$.getJSON( "http://localhost:3333/res/jsonConfigFiles/rect1.json", function( jsonData ) {
+    rectConfig = JSON.parse(JSON.stringify(jsonData));
+    createRect(rectConfig);
+})
 
-createRect(rectConfig);
 
 let lastMousePositionX = null,
     lastMousePositionY = null;
