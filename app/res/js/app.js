@@ -63,6 +63,7 @@ function createRect(config) {
     div.style.left = config.x_pos + 'px';
     div.style.top = config.y_pos + 'px';
     div.style.transition = '0.1s';
+    div.classList.add("target");
 
     document.body.appendChild(div);
 }
