@@ -1,5 +1,6 @@
 /* jshint esversion: 6 */
 
+let DISTANCE_SENSITIVITY = 300;
 let rectConfig = {
     id: "div-test",
     width: 100,
@@ -30,21 +31,19 @@ document.body.addEventListener('mousemove', event => {
 function moveRect(mouseX, mouseY) {
     let div = document.getElementById(rectConfig.id),
         currentPositionX = mouseX,
-        currentPositionY = mouseY;
-
-    // todo: choose reasonable distance and implement
-    // if (distance > 300) { return; }
+        currentPositionY = mouseY,
+        divTop = parseInt(div.style.top),
+        divLeft = parseInt(div.style.left),
+        distance = Math.sqrt((divTop - currentPositionY) * (divTop - currentPositionY) + (divLeft - currentPositionX) * (divLeft - currentPositionX));
 
     let dx = currentPositionX - lastMousePositionX;
     let dy = currentPositionY - lastMousePositionY;
 
-    let divTop = parseInt(div.style.top),
-        divLeft = parseInt(div.style.left);
-
-
     if (div.matches(":hover")) {
         //Mouse is inside element
         console.log("inside element");
+    } else if (distance > DISTANCE_SENSITIVITY) {
+        // do nothing
     } else {
         div.style.top = divTop + (-1 * dy) + 'px';
         div.style.left = divLeft + (-1 * dx) + 'px';
@@ -63,7 +62,7 @@ function createRect(config) {
     div.style.position = "absolute";
     div.style.left = config.x_pos + 'px';
     div.style.top = config.y_pos + 'px';
-    // div.style.transition = '0.2s';
+    div.style.transition = '0.1s';
 
     document.body.appendChild(div);
 }
