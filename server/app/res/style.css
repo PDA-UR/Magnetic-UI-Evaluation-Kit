@@ -4,3 +4,19 @@ html, body {
     padding: 0;
     margin: 0;
 }
+
+.center {
+    height: 40px;
+    width: 40px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: block;
+    position: absolute;
+    top: 50%;
+    margin-top: -20px;
+    left: 50%;
+    margin-left: -20px;
+  }
+.center:hover {
+    background-color: black;
+}

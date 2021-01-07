@@ -1,16 +1,21 @@
 /* jshint esversion: 6 */
 
+let DISTANCE_SENSITIVITY = 300;
+// configure the movement speed of the elements here (0-1)
+let UI_SPEED_X = 0.2;
+let UI_SPEED_Y = 0.2;
+
 let rectConfig;
 //Get JSON config file from Server
-$.getJSON( "http://localhost:3333/res/jsonConfigFiles/rect1.json", function( jsonData ) {
+$.getJSON("http://localhost:3333/res/jsonConfigFiles/rect1.json", function (jsonData) {
     rectConfig = JSON.parse(JSON.stringify(jsonData));
     createRect(rectConfig);
-})
+});
 
 
 let lastMousePositionX = null,
-    lastMousePositionY = null;
-    mouseIsInsideOfElement = false;
+    lastMousePositionY = null,
+    mouseIsInsideOfElement = false,
     timeAtLastSuccessfulClick = Date.now();
 
 
@@ -20,7 +25,7 @@ document.body.addEventListener('mousemove', event => {
 
     if (lastMousePositionX == null || lastMousePositionY == null) {
         lastMousePositionX = event.clientX;
-        lastMousePositionY = event.clientY
+        lastMousePositionY = event.clientY;
     } else {
         moveRect(event.clientX, event.clientY);
     }
@@ -28,7 +33,7 @@ document.body.addEventListener('mousemove', event => {
 });
 
 //click listener to recognize if element is clicked
-document.body.addEventListener('click', event=> {
+document.body.addEventListener('click', event => {
     if (event.target.id == rectConfig.id) {
         clickTime = Date.now();
         let timeSinceLastSuccessfulClick = clickTime - timeAtLastSuccessfulClick;
@@ -44,39 +49,32 @@ document.body.addEventListener('click', event=> {
 function moveRect(mouseX, mouseY) {
     let div = document.getElementById(rectConfig.id),
         currentPositionX = mouseX,
-        currentPositionY = mouseY;
+        currentPositionY = mouseY,
+        divTop = parseInt(div.style.top),
+        divLeft = parseInt(div.style.left),
+        distance = Math.sqrt((divTop - currentPositionY) * (divTop - currentPositionY) + (divLeft - currentPositionX) * (divLeft - currentPositionX));
 
-    // todo: choose reasonable distance and implement
-    // if (distance > 300) { return; }
-
-
-    // configure the movement speed of the elements here (0-1)
-    let UiSpeedX = 0.2;
-    let UiSpeedY = 0.2;
-
-    let dx = (currentPositionX - lastMousePositionX) * UiSpeedX;
-    let dy = (currentPositionY - lastMousePositionY) * UiSpeedY;
-
-
-    let divTop = parseInt(div.style.top),
-        divLeft = parseInt(div.style.left);
+    let dx = (currentPositionX - lastMousePositionX) * UI_SPEED_X;
+    let dy = (currentPositionY - lastMousePositionY) * UI_SPEED_Y;
 
 
     if (div.matches(":hover")) {
         //Mouse is inside element
         //Check if mouse entered the element just now
-        if (!mouseIsInsideOfElement){
+        if (!mouseIsInsideOfElement) {
             console.log("moved inside of element");
             mouseIsInsideOfElement = true;
         }
-    
+
+    } else if (distance > DISTANCE_SENSITIVITY) {
+        // do nothing
     } else {
         //Check if mouse left the element just now
-        if (mouseIsInsideOfElement){
+        if (mouseIsInsideOfElement) {
             console.log("moved outside of element");
             mouseIsInsideOfElement = false;
         }
-        
+
         mouseIsInsideOfElement = false;
         div.style.top = divTop + (-1 * dy) + 'px';
         div.style.left = divLeft + (-1 * dx) + 'px';
