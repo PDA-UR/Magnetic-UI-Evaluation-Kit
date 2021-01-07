@@ -1,6 +1,6 @@
 /* jshint esversion: 6 */
 
-let DISTANCE_SENSITIVITY = 300;
+let DISTANCE_SENSITIVITY = 400;
 // configure the movement speed of the elements here (0-1)
 let UI_SPEED_X = 0.2;
 let UI_SPEED_Y = 0.2;
@@ -94,7 +94,7 @@ function createRect(config) {
     div.style.position = "absolute";
     div.style.left = config.x_pos + 'px';
     div.style.top = config.y_pos + 'px';
-    // div.style.transition = '0.2s';
+    div.style.transition = '0.1s';
     document.body.appendChild(div);
 }
 
