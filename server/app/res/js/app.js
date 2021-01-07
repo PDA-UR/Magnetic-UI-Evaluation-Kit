@@ -1,13 +1,13 @@
 /* jshint esversion: 6 */
 
-let DISTANCE_SENSITIVITY = 400;
+let DISTANCE_SENSITIVITY = 800;
 // configure the movement speed of the elements here (0-1)
 let UI_SPEED_X = 0.2;
 let UI_SPEED_Y = 0.2;
 
 let rectConfig;
 //Get JSON config file from Server
-$.getJSON("http://localhost:3333/res/jsonConfigFiles/rect1.json", function (jsonData) {
+$.getJSON('http://localhost:3333/res/jsonConfigFiles/rect1.json', function (jsonData) {
     rectConfig = JSON.parse(JSON.stringify(jsonData));
     createRect(rectConfig);
 });
@@ -16,10 +16,11 @@ $.getJSON("http://localhost:3333/res/jsonConfigFiles/rect1.json", function (json
 let lastMousePositionX = null,
     lastMousePositionY = null,
     mouseIsInsideOfElement = false,
-    timeAtLastSuccessfulClick = Date.now();
+    timeAtLastSuccessfulClick = Date.now(),
+    frame = document.getElementById('frame');
 
 
-document.body.addEventListener('mousemove', event => {
+frame.addEventListener('mousemove', event => {
     // clientX/clientY: Returns the horizontal/vertical coordinate of the mouse pointer,
     // relative to the current window, when the mouse event was triggered
 
@@ -33,14 +34,14 @@ document.body.addEventListener('mousemove', event => {
 });
 
 //click listener to recognize if element is clicked
-document.body.addEventListener('click', event => {
+frame.addEventListener('click', event => {
     if (event.target.id == rectConfig.id) {
         clickTime = Date.now();
         let timeSinceLastSuccessfulClick = clickTime - timeAtLastSuccessfulClick;
-        console.log("clicked element " + event.target.name + " in " + timeSinceLastSuccessfulClick);
+        console.log('clicked element ' + event.target.name + ' in ' + timeSinceLastSuccessfulClick);
         timeAtLastSuccessfulClick = clickTime;
     } else {
-        console.log("clicked no element");
+        console.log('clicked no target element (' + event.target.id + ')');
     }
 
 });
@@ -58,20 +59,21 @@ function moveRect(mouseX, mouseY) {
     let dy = (currentPositionY - lastMousePositionY) * UI_SPEED_Y;
 
 
-    if (div.matches(":hover")) {
+    if (div.matches(':hover')) {
         //Mouse is inside element
         //Check if mouse entered the element just now
         if (!mouseIsInsideOfElement) {
-            console.log("moved inside of element");
+            console.log('moved inside of element');
             mouseIsInsideOfElement = true;
         }
 
     } else if (distance > DISTANCE_SENSITIVITY) {
         // do nothing
+        console.log('distance too big: ' + distance);
     } else {
         //Check if mouse left the element just now
         if (mouseIsInsideOfElement) {
-            console.log("moved outside of element");
+            console.log('moved outside of element');
             mouseIsInsideOfElement = false;
         }
 
@@ -85,17 +87,19 @@ function moveRect(mouseX, mouseY) {
 }
 
 function createRect(config) {
-    let div = document.createElement("div");
+    let div = document.createElement('div');
     div.id = config.id;
     div.name = config.name;
-    div.style.width = config.width + "px";
-    div.style.height = config.height + "px";
+    div.style.width = config.width + 'mm';
+    div.style.height = config.height + 'mm';
     div.style.background = config.color;
-    div.style.position = "absolute";
-    div.style.left = config.x_pos + 'px';
-    div.style.top = config.y_pos + 'px';
+    div.style.position = 'absolute';
+    div.style.display = 'inline';
+    div.style.left = config.x_pos + 'mm';
+    div.style.top = config.y_pos + 'mm';
     div.style.transition = '0.1s';
-    document.body.appendChild(div);
+
+    document.getElementById('frame').appendChild(div);
 }
 
 

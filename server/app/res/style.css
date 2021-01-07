@@ -5,18 +5,30 @@ html, body {
     margin: 0;
 }
 
-.center {
-    height: 40px;
-    width: 40px;
+#frame {
+    height: 100mm;
+    width: 200mm;
+    border-style: solid;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -50mm;
+    margin-left: -100mm;
+    overflow: hidden;
+}
+
+#center {
+    height: 8mm;
+    width: 8mm;
     background-color: #bbb;
     border-radius: 50%;
     display: block;
     position: absolute;
     top: 50%;
-    margin-top: -20px;
+    margin-top: -4mm;
     left: 50%;
-    margin-left: -20px;
+    margin-left: -4mm;
   }
-.center:hover {
+#center:hover {
     background-color: black;
 }
