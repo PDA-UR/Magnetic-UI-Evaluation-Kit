@@ -41,9 +41,10 @@ function mmToPX (mm, dpi) {
 }
 
 let lastMousePositionX = null,
-    lastMousePositionY = null;
-    mouseIsInsideOfElement = false;
-    timeAtLastSuccessfulClick = Date.now();
+    lastMousePositionY = null,
+    mouseIsInsideOfElement = false,
+    timeAtLastSuccessfulClick = Date.now(),
+    frame = document.getElementById('frame');
 
 
 
@@ -54,7 +55,7 @@ frame.addEventListener('mousemove', event => {
 
     if (lastMousePositionX == null || lastMousePositionY == null) {
         lastMousePositionX = event.clientX;
-        lastMousePositionY = event.clientY
+        lastMousePositionY = event.clientY;
     } else {
         moveRect(event.clientX, event.clientY);
     }
@@ -62,11 +63,11 @@ frame.addEventListener('mousemove', event => {
 });
 
 //click listener to recognize if element is clicked
-document.body.addEventListener('click', event=> {
+frame.addEventListener('click', event => {
     if (event.target.id == rectConfig.id) {
         clickTime = Date.now();
         let timeSinceLastSuccessfulClick = clickTime - timeAtLastSuccessfulClick;
-        console.log("clicked element " + event.target.name + " in " + timeSinceLastSuccessfulClick);
+        console.log('clicked element ' + event.target.name + ' in ' + timeSinceLastSuccessfulClick);
         timeAtLastSuccessfulClick = clickTime;
     } else {
         console.log('clicked no target element (' + event.target.id + ')');
@@ -79,39 +80,33 @@ document.body.addEventListener('click', event=> {
 function moveRect(mouseX, mouseY) {
     let div = document.getElementById(rectConfig.id),
         currentPositionX = mouseX,
-        currentPositionY = mouseY;
+        currentPositionY = mouseY,
+        divTop = parseInt(div.style.top),
+        divLeft = parseInt(div.style.left),
+        distance = Math.sqrt((divTop - currentPositionY) * (divTop - currentPositionY) + (divLeft - currentPositionX) * (divLeft - currentPositionX));
 
-    // todo: choose reasonable distance and implement
-    // if (distance > 300) { return; }
-
-
-    // configure the movement speed of the elements here (0-1)
-    let UiSpeedX = 0.2;
-    let UiSpeedY = 0.2;
-
-    let dx = (currentPositionX - lastMousePositionX) * UiSpeedX;
-    let dy = (currentPositionY - lastMousePositionY) * UiSpeedY;
+    let dx = (currentPositionX - lastMousePositionX) * UI_SPEED_X;
+    let dy = (currentPositionY - lastMousePositionY) * UI_SPEED_Y;
 
 
-    let divTop = parseInt(div.style.top),
-        divLeft = parseInt(div.style.left);
-
-
-    if (div.matches(":hover")) {
+    if (div.matches(':hover')) {
         //Mouse is inside element
         //Check if mouse entered the element just now
-        if (!mouseIsInsideOfElement){
-            console.log("moved inside of element");
+        if (!mouseIsInsideOfElement) {
+            console.log('moved inside of element');
             mouseIsInsideOfElement = true;
         }
-    
+
+    } else if (distance > DISTANCE_SENSITIVITY) {
+        // do nothing
+        console.log('distance too big: ' + distance);
     } else {
         //Check if mouse left the element just now
-        if (mouseIsInsideOfElement){
-            console.log("moved outside of element");
+        if (mouseIsInsideOfElement) {
+            console.log('moved outside of element');
             mouseIsInsideOfElement = false;
         }
-        
+
         mouseIsInsideOfElement = false;
         div.style.top = divTop + (-1 * dy) + 'px';
         div.style.left = divLeft + (-1 * dx) + 'px';
@@ -155,8 +150,8 @@ function createRect2(config) {
     let div = document.createElement('div');
     div.id = "rect2";
     div.name = config.name;
-    div.style.width = config.width + "px";
-    div.style.height = config.height + "px";
+    div.style.width = config.width + 'mm';
+    div.style.height = config.height + 'mm';
     div.style.background = config.color;
     div.style.position = 'absolute';
     div.style.display = 'inline';
