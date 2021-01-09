@@ -1,16 +1,44 @@
 /* jshint esversion: 6 */
 
-let rectConfig = {
-    id: "div-test",
-    width: 100,
-    height: 150,
-    color: "red",
-    x_pos: 400,
-    y_pos: 200,
-    name: "redFirst"
-};
+let DISTANCE_SENSITIVITY = 800;
+// configure the movement speed of the elements here (0-1)
+let UI_SPEED_X = 0.2;
+let UI_SPEED_Y = 0.2;
+let rectConfig;
 
-createRect(rectConfig);
+
+
+//Get JSON config file from Server
+$.getJSON('http://localhost:3333/res/jsonConfigFiles/rect1.json', function (jsonData) {
+    rectConfig = JSON.parse(JSON.stringify(jsonData));
+    createRect(rectConfig);
+    createRect2(rectConfig);
+    createRect3(rectConfig);
+});
+
+
+/*
+Dieser Monitor:
+2560 × 1600 (16∶10), 227dpi
+*/
+
+let realDpi = 227,
+    realScreenWidth = 2560,
+    realScreenHeight = 1600;
+
+console.log(pxToMM(1600, realDpi))
+
+function pxToMM (px, dpi) {
+    let mm = ((px * (realScreenWidth/screen.width)) * 25.4 ) / dpi;
+    return mm
+}
+console.log(mmToPX(179, realDpi));
+console.log(pxToMM(mmToPX(179, realDpi), realDpi))
+
+function mmToPX (mm, dpi) {
+    let px = ((mm * dpi) / 25.4) / (realScreenWidth/screen.width);
+    return px
+}
 
 let lastMousePositionX = null,
     lastMousePositionY = null;
@@ -18,7 +46,9 @@ let lastMousePositionX = null,
     timeAtLastSuccessfulClick = Date.now();
 
 
-document.body.addEventListener('mousemove', event => {
+
+
+frame.addEventListener('mousemove', event => {
     // clientX/clientY: Returns the horizontal/vertical coordinate of the mouse pointer,
     // relative to the current window, when the mouse event was triggered
 
@@ -39,7 +69,8 @@ document.body.addEventListener('click', event=> {
         console.log("clicked element " + event.target.name + " in " + timeSinceLastSuccessfulClick);
         timeAtLastSuccessfulClick = clickTime;
     } else {
-        console.log("clicked no element");
+        console.log('clicked no target element (' + event.target.id + ')');
+    
     }
 
 });
@@ -90,18 +121,65 @@ function moveRect(mouseX, mouseY) {
     lastMousePositionY = currentPositionY;
 }
 
+
+window.getDevicePixelRatio = function () {
+    var ratio = 1;
+    // To account for zoom, change to use deviceXDPI instead of systemXDPI
+    if (window.screen.systemXDPI !== undefined && window.screen.logicalXDPI       !== undefined && window.screen.systemXDPI > window.screen.logicalXDPI) {
+        // Only allow for values > 1
+        ratio = window.screen.systemXDPI / window.screen.logicalXDPI;
+    }
+    else if (window.devicePixelRatio !== undefined) {
+        ratio = window.devicePixelRatio;
+    }
+    return ratio;
+};
+
 function createRect(config) {
-    let div = document.createElement("div");
-    div.id = config.id;
+    let div = document.createElement('div');
+    div.id = "rect1";
+    div.name = config.name;
+    div.style.width = mmToPX(25, realDpi)+ 'px';
+    div.style.height = mmToPX(25, realDpi)+ 'px';
+    div.style.background = config.color;
+    div.style.position = 'absolute';
+    div.style.display = 'inline';
+    div.style.left = 0 + 'px';
+    div.style.top = 100 + 'px';
+    div.style.transition = '0.1s';
+    document.getElementById('frame').appendChild(div);
+
+}
+
+function createRect2(config) {
+    let div = document.createElement('div');
+    div.id = "rect2";
     div.name = config.name;
     div.style.width = config.width + "px";
     div.style.height = config.height + "px";
     div.style.background = config.color;
-    div.style.position = "absolute";
-    div.style.left = config.x_pos + 'px';
-    div.style.top = config.y_pos + 'px';
-    // div.style.transition = '0.2s';
-    document.body.appendChild(div);
+    div.style.position = 'absolute';
+    div.style.display = 'inline';
+    div.style.left = 500 + 'px';
+    div.style.top = 100 + 'px';
+    div.style.transition = '0.1s';
+    document.getElementById('frame').appendChild(div);
+}
+
+
+function createRect3(config) {
+    let div = document.createElement('div');
+    div.id = "rect1";
+    div.name = config.name;
+    div.style.width = ((25 * realDpi) / 25.4) / window.devicePixelRatio + 'px';
+    div.style.height = ((25 * realDpi) / 25.4) / window.devicePixelRatio + 'px';
+    div.style.background = config.color;
+    div.style.position = 'absolute';
+    div.style.display = 'inline';
+    div.style.left = 250 + 'px';
+    div.style.top = 100 + 'px';
+    div.style.transition = '0.1s';
+    document.getElementById('frame').appendChild(div);
 }
 
 
