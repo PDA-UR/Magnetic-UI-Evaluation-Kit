@@ -1,19 +1,25 @@
 /* jshint esversion: 6 */
 
-let DISTANCE_SENSITIVITY = 800;
+let DISTANCE_SENSITIVITY = 2000;
 // configure the movement speed of the elements here (0-1)
-let UI_SPEED_X = 0.2;
-let UI_SPEED_Y = 0.2;
+let UI_SPEED_X = 0.5;
+let UI_SPEED_Y = 0.5;
 let rectConfig;
+
+let lastMousePositionX = null,
+    lastMousePositionY = null,
+    mouseIsInsideOfElement = false,
+    timeAtLastSuccessfulClick = Date.now(),
+    frame = document.getElementById('frame');
 
 
 
 //Get JSON config file from Server
 $.getJSON('http://localhost:3333/res/jsonConfigFiles/rect1.json', function (jsonData) {
     rectConfig = JSON.parse(JSON.stringify(jsonData));
+    createFrame();
     createRect(rectConfig);
-    createRect2(rectConfig);
-    createRect3(rectConfig);
+    createCustomCursor();
 });
 
 
@@ -40,11 +46,7 @@ function mmToPX (mm, dpi) {
     return px
 }
 
-let lastMousePositionX = null,
-    lastMousePositionY = null,
-    mouseIsInsideOfElement = false,
-    timeAtLastSuccessfulClick = Date.now(),
-    frame = document.getElementById('frame');
+
 
 
 
@@ -56,40 +58,55 @@ frame.addEventListener('mousemove', event => {
     if (lastMousePositionX == null || lastMousePositionY == null) {
         lastMousePositionX = event.clientX;
         lastMousePositionY = event.clientY;
+
+        
     } else {
-        moveRect(event.clientX, event.clientY);
+        moveCustomCursor(event.movementX, event.movementY);
+        moveRectangle(event.movementX, event.movementY);
     }
 
 });
 
 //click listener to recognize if element is clicked
 frame.addEventListener('click', event => {
-    if (event.target.id == rectConfig.id) {
+    let targetRectangle = document.getElementById("rect1");
+    if (cursorIsInsideOfElement(targetRectangle)) {
         clickTime = Date.now();
         let timeSinceLastSuccessfulClick = clickTime - timeAtLastSuccessfulClick;
-        console.log('clicked element ' + event.target.name + ' in ' + timeSinceLastSuccessfulClick);
+        console.log('clicked element ' + targetRectangle.name + ' in ' + timeSinceLastSuccessfulClick);
         timeAtLastSuccessfulClick = clickTime;
     } else {
-        console.log('clicked no target element (' + event.target.id + ')');
+        console.log('clicked canvas');
+
+        
+        frame.requestPointerLock = frame.requestPointerLock ||
+        element.mozRequestPointerLock ||
+        element.webkitRequestPointerLock;
+        frame.requestPointerLock();
     
     }
 
 });
 
 
-function moveRect(mouseX, mouseY) {
-    let div = document.getElementById(rectConfig.id),
-        currentPositionX = mouseX,
-        currentPositionY = mouseY,
+function moveCustomCursor(mouseMovementX, mouseMovementY){
+    let customCursor = document.getElementById("customCursor");
+    customCursorTop = parseInt(customCursor.style.top),
+    customCursorLeft = parseInt(customCursor.style.left),
+    customCursor.style.left = (customCursorLeft + mouseMovementX) + "px";
+    customCursor.style.top = (customCursorTop + mouseMovementY) + "px";
+
+}
+
+function moveRectangle(mouseMovementX, mouseMovementY){
+
+    let div = document.getElementById("rect1"),
+        customCursor = document.getElementById("customCursor"),
         divTop = parseInt(div.style.top),
         divLeft = parseInt(div.style.left),
-        distance = Math.sqrt((divTop - currentPositionY) * (divTop - currentPositionY) + (divLeft - currentPositionX) * (divLeft - currentPositionX));
+        distance = Math.sqrt((divTop - customCursor.style.top) * (divTop - customCursor.style.top) + (divLeft - customCursor.style.left) * (divLeft - customCursor.style.left));
 
-    let dx = (currentPositionX - lastMousePositionX) * UI_SPEED_X;
-    let dy = (currentPositionY - lastMousePositionY) * UI_SPEED_Y;
-
-
-    if (div.matches(':hover')) {
+    if (cursorIsInsideOfElement(div)) {
         //Mouse is inside element
         //Check if mouse entered the element just now
         if (!mouseIsInsideOfElement) {
@@ -108,14 +125,36 @@ function moveRect(mouseX, mouseY) {
         }
 
         mouseIsInsideOfElement = false;
-        div.style.top = divTop + (-1 * dy) + 'px';
-        div.style.left = divLeft + (-1 * dx) + 'px';
-    }
+        newY = divTop + (-1 * mouseMovementY);
+        newX = divLeft + (-1 * mouseMovementX);
 
-    lastMousePositionX = currentPositionX;
-    lastMousePositionY = currentPositionY;
+        div.style.top = limitNumberWithinRange(newY, 0, 650) + 'px';
+        div.style.left = limitNumberWithinRange(newX, 0, 900) + 'px';
+    }
 }
 
+function cursorIsInsideOfElement(elementToCheck){
+    cursor = document.getElementById("customCursor");
+    rect1 = cursor.getBoundingClientRect();
+    rect2 = elementToCheck.getBoundingClientRect();
+
+    if(!(rect1.right < rect2.left || 
+        rect1.left > rect2.right || 
+        rect1.bottom < rect2.top || 
+        rect1.top > rect2.bottom)){
+        return true;
+        
+    }   else {
+        return false;
+    }
+}
+
+function limitNumberWithinRange(num, min, max){
+    const MIN = min || 1;
+    const MAX = max || 20;
+    const parsed = parseInt(num)
+    return Math.min(Math.max(parsed, MIN), MAX)
+  }
 
 window.getDevicePixelRatio = function () {
     var ratio = 1;
@@ -130,52 +169,48 @@ window.getDevicePixelRatio = function () {
     return ratio;
 };
 
+function createFrame(){
+    frame.style.width = 1000 + 'px';
+    frame.style.height = 750 + 'px';
+    frame.style.background = "blue";
+    frame.style.position = 'fixed';
+    frame.style.display = 'inline';
+}
+
+function createCustomCursor(){
+    let customCursor = document.createElement('div');
+    customCursor.id = "customCursor";
+    customCursor.style.width = 10 + 'px';
+    customCursor.style.height = 10 + 'px';
+    customCursor.style.background = "yellow";
+    customCursor.style.position = 'absolute';
+    customCursor.display = 'inline';
+    customCursor.style.left = 0;
+    customCursor.style.top = 0;
+    frame.appendChild(customCursor);
+}
+
 function createRect(config) {
     let div = document.createElement('div');
     div.id = "rect1";
-    div.name = config.name;
-    div.style.width = mmToPX(25, realDpi)+ 'px';
-    div.style.height = mmToPX(25, realDpi)+ 'px';
-    div.style.background = config.color;
+    div.name = "rectangleRed";
+    div.style.width = 100 + 'px';
+    div.style.height = 100 + 'px';
+    div.style.background = "red";
     div.style.position = 'absolute';
     div.style.display = 'inline';
-    div.style.left = 0 + 'px';
-    div.style.top = 100 + 'px';
+    let xCoord = getRndInteger(0, parseInt(frame.style.width) - parseInt(div.style.width));
+    let yCoord = getRndInteger(0, parseInt(frame.style.height) - parseInt(div.style.height));
+    div.style.left = xCoord + "px";
+    div.style.top = yCoord + "px";
     div.style.transition = '0.1s';
-    document.getElementById('frame').appendChild(div);
-
+    frame.appendChild(div);
 }
 
-function createRect2(config) {
-    let div = document.createElement('div');
-    div.id = "rect2";
-    div.name = config.name;
-    div.style.width = config.width + 'mm';
-    div.style.height = config.height + 'mm';
-    div.style.background = config.color;
-    div.style.position = 'absolute';
-    div.style.display = 'inline';
-    div.style.left = 500 + 'px';
-    div.style.top = 100 + 'px';
-    div.style.transition = '0.1s';
-    document.getElementById('frame').appendChild(div);
-}
+function getRndInteger(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) ) + min;
+  }
 
-
-function createRect3(config) {
-    let div = document.createElement('div');
-    div.id = "rect1";
-    div.name = config.name;
-    div.style.width = ((25 * realDpi) / 25.4) / window.devicePixelRatio + 'px';
-    div.style.height = ((25 * realDpi) / 25.4) / window.devicePixelRatio + 'px';
-    div.style.background = config.color;
-    div.style.position = 'absolute';
-    div.style.display = 'inline';
-    div.style.left = 250 + 'px';
-    div.style.top = 100 + 'px';
-    div.style.transition = '0.1s';
-    document.getElementById('frame').appendChild(div);
-}
 
 
 
