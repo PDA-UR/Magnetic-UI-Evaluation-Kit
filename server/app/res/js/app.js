@@ -10,7 +10,15 @@ let lastMousePositionX = null,
     lastMousePositionY = null,
     mouseIsInsideOfElement = false,
     timeAtLastSuccessfulClick = Date.now(),
-    frame = document.getElementById('frame');
+    frame = document.getElementById('frame'),
+    timeAtLoadingComplete;
+
+let csvContent = "Loaded scene at; Entered Object after ms; Left Object after ms; Missed Click after ms; Successful click after ms;",
+    missedClicks = [],
+    enteredObject = [],
+    leftObject = [],
+    timeUntilSuccessfulClick;
+    
 
 
 
@@ -18,8 +26,9 @@ let lastMousePositionX = null,
 $.getJSON('http://localhost:3333/res/jsonConfigFiles/rect1.json', function (jsonData) {
     rectConfig = JSON.parse(JSON.stringify(jsonData));
     createFrame();
-    createRect(rectConfig);
-    createCustomCursor();
+    createRect();
+    createCustomCursor(100, 100);
+    timeAtLoadingComplete = Date.now();
 });
 
 
@@ -62,23 +71,29 @@ frame.addEventListener('mousemove', event => {
         
     } else {
         moveCustomCursor(event.movementX, event.movementY);
-        moveRectangle(event.movementX, event.movementY);
     }
 
 });
 
 //click listener to recognize if element is clicked
 frame.addEventListener('click', event => {
-    let targetRectangle = document.getElementById("rect1");
+    let targetRectangle = document.getElementById("rect1"),
+        cursor = document.getElementById("customCursor");
     if (cursorIsInsideOfElement(targetRectangle)) {
+        //clicked element
         clickTime = Date.now();
-        let timeSinceLastSuccessfulClick = clickTime - timeAtLastSuccessfulClick;
-        console.log('clicked element ' + targetRectangle.name + ' in ' + timeSinceLastSuccessfulClick);
-        timeAtLastSuccessfulClick = clickTime;
-    } else {
-        console.log('clicked canvas');
-
+        timeUntilSuccessfulClick = clickTime - timeAtLoadingComplete;
+        removeElement(targetRectangle.id);
+        removeElement(cursor.id)
+        createRect();
+        let newCursorCoords = getNewCursorCoordinates(document.getElementById("rect1"));
+        createCustomCursor(newCursorCoords[0], newCursorCoords[1]);
+        mouseIsInsideOfElement = false;
+        logAllData();
         
+    } else {
+        //clicked canvas
+        missedClicks.push(Date.now() - timeAtLoadingComplete);
         frame.requestPointerLock = frame.requestPointerLock ||
         element.mozRequestPointerLock ||
         element.webkitRequestPointerLock;
@@ -89,12 +104,115 @@ frame.addEventListener('click', event => {
 });
 
 
+function logAllData(){
+    console.log("Loaded scene: " + timeAtLoadingComplete);
+    console.log("Entered: " + enteredObject);
+    console.log("Left: " + leftObject);
+    console.log("Click missed: " + missedClicks);
+    console.log("Clicked success: " + timeUntilSuccessfulClick);
+    
+    let timeAtLoadingCompleteString = timeAtLoadingComplete;
+        enteredObjectString = "; ",
+        leftObjectString = "; ",
+        missedClicksString = "; ",
+        timeUntilSuccessfulClickString = "; " + timeUntilSuccessfulClick + ";";
+
+    enteredObject.forEach((val, key, enteredObject) => {
+        if (Object.is(enteredObject.length - 1, key)) {
+            // execute last item logic
+            enteredObjectString = enteredObjectString + val
+          } else{
+            enteredObjectString = enteredObjectString + val + ", "
+          }
+    });
+
+    missedClicks.forEach((val, key, missedClicks) => {
+        if (Object.is(missedClicks.length - 1, key)) {
+            // execute last item logic
+            missedClicksString = missedClicksString + val
+          } else{
+            missedClicksString = missedClicksString + val + ", "
+          }
+    });
+
+    leftObject.forEach((val, key, leftObject) => {
+        if (Object.is(leftObject.length - 1, key)) {
+            // execute last item logic
+            leftObjectString = leftObjectString + val
+          } else{
+            leftObjectString = leftObjectString + val + ", "
+          }
+    });
+
+    let logString = timeAtLoadingComplete + enteredObjectString + leftObjectString + missedClicksString + timeUntilSuccessfulClickString;
+    csvContent = csvContent + "\n" + logString;
+    console.log(csvContent);
+
+    enteredObject = [];
+    leftObject = [];
+    missedClicks = [];
+    timeAtLoadingComplete = Date.now();
+
+    
+    
+}
+
+function getNewCursorCoordinates(elementToSpawnAround){
+    let centerX = parseInt(elementToSpawnAround.style.left) - 5 + parseInt(elementToSpawnAround.style.width)/2,
+        centerY = parseInt(elementToSpawnAround.style.top) - 5 + parseInt(elementToSpawnAround.style.height)/2,
+  
+        cursorStartX = centerX + 300,
+        cursorStartY = centerY,
+        coords = rotateAroundCenter(centerX, centerY, cursorStartX, cursorStartY);
+
+    while (coords[0] > 1000 || coords[0] < 0 || coords[1] > 750 || coords[1] < 0){
+        coords =  rotateAroundCenter(centerX, centerY, cursorStartX, cursorStartY);
+    }
+    
+    return coords;
+}
+
+function rotateAroundCenter(centerX, centerY, cursorStartX, cursorStartY){
+    let coords = Array.from({length: 2}),
+        rad = degreesToRadians(getRndInteger(0, 360)),
+        sin = Math.sin(rad),
+        cos =  Math.cos(rad);
+
+        coords[0] = cos * (cursorStartX - centerX) - sin * (cursorStartY - centerY) + centerX;
+        coords[1] = sin * (cursorStartX - centerX) - cos * (cursorStartY - centerY) + centerY;
+
+    return coords;  
+}
+
+function degreesToRadians(degrees)
+{
+  var pi = Math.PI;
+  return degrees * (pi/180);
+}
+
+function removeElement(elementId) {
+    // Removes an element from the document
+    var element = document.getElementById(elementId);
+    element.parentNode.removeChild(element);
+}
+
+
 function moveCustomCursor(mouseMovementX, mouseMovementY){
     let customCursor = document.getElementById("customCursor");
     customCursorTop = parseInt(customCursor.style.top),
     customCursorLeft = parseInt(customCursor.style.left),
-    customCursor.style.left = (customCursorLeft + mouseMovementX) + "px";
-    customCursor.style.top = (customCursorTop + mouseMovementY) + "px";
+    newCursorX = (customCursorLeft + mouseMovementX) + "px",
+    newCursorY = (customCursorTop + mouseMovementY) + "px";
+
+    if (parseInt(newCursorX) >= parseInt(1000 - 10) || parseInt(newCursorX) <= parseInt(0)){
+        moveRectangle(0, mouseMovementY);
+    }   else if(parseInt(newCursorY) >= parseInt(750 - 10) || parseInt(newCursorY) <= parseInt(0)){
+        moveRectangle(mouseMovementX, 0);
+    }   else {
+        moveRectangle(mouseMovementX, mouseMovementY);
+    }
+    customCursor.style.left = limitNumberWithinRange(newCursorX, 0, 1000 - 10) + 'px',
+    customCursor.style.top = limitNumberWithinRange(newCursorY, 0, 750 - 10) + 'px';
 
 }
 
@@ -110,7 +228,7 @@ function moveRectangle(mouseMovementX, mouseMovementY){
         //Mouse is inside element
         //Check if mouse entered the element just now
         if (!mouseIsInsideOfElement) {
-            console.log('moved inside of element');
+            enteredObject.push(Date.now() - timeAtLoadingComplete);
             mouseIsInsideOfElement = true;
         }
 
@@ -120,7 +238,7 @@ function moveRectangle(mouseMovementX, mouseMovementY){
     } else {
         //Check if mouse left the element just now
         if (mouseIsInsideOfElement) {
-            console.log('moved outside of element');
+            leftObject.push(Date.now() - timeAtLoadingComplete)
             mouseIsInsideOfElement = false;
         }
 
@@ -177,7 +295,7 @@ function createFrame(){
     frame.style.display = 'inline';
 }
 
-function createCustomCursor(){
+function createCustomCursor(x, y){
     let customCursor = document.createElement('div');
     customCursor.id = "customCursor";
     customCursor.style.width = 10 + 'px';
@@ -185,12 +303,12 @@ function createCustomCursor(){
     customCursor.style.background = "yellow";
     customCursor.style.position = 'absolute';
     customCursor.display = 'inline';
-    customCursor.style.left = 0;
-    customCursor.style.top = 0;
+    customCursor.style.left = x + "px";
+    customCursor.style.top = y + "px";
     frame.appendChild(customCursor);
 }
 
-function createRect(config) {
+function createRect() {
     let div = document.createElement('div');
     div.id = "rect1";
     div.name = "rectangleRed";
@@ -205,6 +323,7 @@ function createRect(config) {
     div.style.top = yCoord + "px";
     div.style.transition = '0.1s';
     frame.appendChild(div);
+   
 }
 
 function getRndInteger(min, max) {
