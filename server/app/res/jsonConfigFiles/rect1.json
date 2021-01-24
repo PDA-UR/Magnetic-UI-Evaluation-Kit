@@ -1,8 +1,13 @@
 {
   "id": "div-test",
   "name": "name-test",
+<<<<<<< HEAD
   "width": 10,
   "height": 15,
+=======
+  "width": 25,
+  "height": 25,
+>>>>>>> TestversuchInPixel
   "color": "red",
   "x_pos": 10,
   "y_pos": 10
