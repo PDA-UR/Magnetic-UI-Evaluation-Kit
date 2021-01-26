@@ -2,7 +2,7 @@
 
 let timeAtLastSuccessfulClick,
     frame = document.getElementById('frame'),
-    timeAtLoadingCompletel,
+    timeAtLoadingComplete,
     UI_SPEED_X,
     UI_SPEED_Y,
     rectConfig;
