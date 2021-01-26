@@ -13,9 +13,9 @@ let customCursor,
 
 //Loged Data    
 let csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,timestampCollision,timestampClick,mouseIsInsideElement,targetX,targetY,targetWidth,targetHeight,cursorX,cursorY",
-    pid = 1,
+    pid = prompt("Please enter your PID"),
     //SET MUI EFFECT HERE (0 static, 1 half MUI, 2 full MUI)
-    condition_id = 1,
+    condition_id = 0,
     run_id = 0,
     timestampConditionStart,
     timestampCollision,
@@ -58,6 +58,8 @@ function setConfigurationParameters(){
             UI_SPEED_X = 1;
             UI_SPEED_Y = 1;
             break;
+        case 3:
+            alert("This is it, you're done!");
     }
 }
 
@@ -249,10 +251,13 @@ function logAllData(){
     targetHeight = targetElement.style.height;
 
     //Number of log entries to be recorded
-    if(run_id == 2){
+    if(run_id == 101){
         if(dataSentToServer == 0){
             post(csvContent);
-            dataSentToServer = 1;
+            condition_id = condition_id + 1;
+            run_id = 0;
+            csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,timestampCollision,timestampClick,mouseIsInsideElement,targetX,targetY,targetWidth,targetHeight,cursorX,cursorY";
+            setConfigurationParameters();
         }
     } 
 
