@@ -5,6 +5,8 @@ let timeAtLastSuccessfulClick,
     timeAtLoadingComplete,
     UI_SPEED_X,
     UI_SPEED_Y,
+    CURSOR_SPEED_X = 1,
+    CURSOR_SPEED_Y = 1,
     rectConfig;
 
 //Cursor and Target element
@@ -14,7 +16,7 @@ let customCursor,
 //Loged Data    
 let csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,timestampCollision,timestampClick,mouseIsInsideElement,targetX,targetY,targetWidth,targetHeight,cursorX,cursorY",
     pid = prompt("Please enter your PID"),
-    condition_id = 0,
+    condition_id = 2,
     run_id = 0,
     timestampConditionStart,
     timestampCollision,
@@ -62,7 +64,14 @@ function setConfigurationParameters(){
             UI_SPEED_Y = 1;
             break;
         case 3:
+            UI_SPEED_X = 0;
+            UI_SPEED_Y = 0;
+            CURSOR_SPEED_X = 1.5;
+            CURSOR_SPEED_Y = 1.5;
+            break;
+        case 4:
             alert("This is it, you're done!");
+            break;
     }
 }
 
@@ -113,8 +122,8 @@ function moveCursor(mouseMovementX, mouseMovementY){
     customCursorTop = parseInt(customCursor.style.top),
     customCursorLeft = parseInt(customCursor.style.left),
 
-    cursorX = limitNumberWithinRange((customCursorLeft + mouseMovementX), 0, 1000 - 10),
-    cursorY = limitNumberWithinRange((customCursorTop + mouseMovementY), 0, 750 - 10);
+    cursorX = limitNumberWithinRange((customCursorLeft + mouseMovementX * CURSOR_SPEED_X), 0, 1000 - 10),
+    cursorY = limitNumberWithinRange((customCursorTop + mouseMovementY * CURSOR_SPEED_X), 0, 750 - 10);
 
     customCursor.style.left = cursorX + 'px',
     customCursor.style.top = cursorY + 'px';
