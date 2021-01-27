@@ -16,7 +16,7 @@ let customCursor,
 //Loged Data    
 let csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,timestampCollision,timestampClick,mouseIsInsideElement,targetX,targetY,targetWidth,targetHeight,cursorX,cursorY",
     pid = prompt("Please enter your PID"),
-    condition_id = 2,
+    condition_id = 0,
     run_id = 0,
     timestampConditionStart,
     timestampCollision,
