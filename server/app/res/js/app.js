@@ -14,7 +14,6 @@ let customCursor,
 //Loged Data    
 let csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,timestampCollision,timestampClick,mouseIsInsideElement,targetX,targetY,targetWidth,targetHeight,cursorX,cursorY",
     pid = prompt("Please enter your PID"),
-    //SET MUI EFFECT HERE (0 static, 1 half MUI, 2 full MUI)
     condition_id = 0,
     run_id = 0,
     timestampConditionStart,
@@ -26,8 +25,12 @@ let csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,t
     targetWidth,
     targetHeight,
     cursorX = null,
-    cursorY = null
-    let dataSentToServer = 0;
+    cursorY = null,
+    chunksSentToServer = 0,
+    csvContentSize = 0,
+    dataHasBeenSentToServer = false;
+//One Chunk equals 10 runs
+let NUMBER_OF_CHUNKS_TO_BE_SENT = 10;
     
 
 //Scene setup
@@ -251,15 +254,26 @@ function logAllData(){
     targetHeight = targetElement.style.height;
 
     //Number of log entries to be recorded
-    if(run_id == 101){
-        if(dataSentToServer == 0){
+    if((run_id % 10 == 0) && run_id != 0){
+        
+        if(chunksSentToServer < NUMBER_OF_CHUNKS_TO_BE_SENT && !dataHasBeenSentToServer){
             post(csvContent);
+            console.log(csvContent);
+            chunksSentToServer = chunksSentToServer + 1;
+            csvContent = "";
+            csvContentSize = 1; 
+            dataHasBeenSentToServer = true;
+        } else if(chunksSentToServer == NUMBER_OF_CHUNKS_TO_BE_SENT){
+            csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,timestampCollision,timestampClick,mouseIsInsideElement,targetX,targetY,targetWidth,targetHeight,cursorX,cursorY";
             condition_id = condition_id + 1;
             run_id = 0;
-            csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,timestampCollision,timestampClick,mouseIsInsideElement,targetX,targetY,targetWidth,targetHeight,cursorX,cursorY";
+            csvContentSize = 0;
+            chunksSentToServer = 0;
             setConfigurationParameters();
-        }
-    } 
+        } 
+    } else {
+        dataHasBeenSentToServer = false;
+    }
 
     //Do not log first run, since pointer lock has to be requested first and the run starts immediately after the page loads 
     //TODO: Implement start screen
@@ -282,6 +296,7 @@ function logAllData(){
         csvContent = csvContent + "\n" + logString;
         console.log(run_id);
     }
+    csvContentSize = csvContentSize + 1;
 }
 
 function post(logData) {
