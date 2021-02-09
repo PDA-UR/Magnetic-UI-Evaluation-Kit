@@ -1,9 +1,12 @@
 from bottle import route, run, request, template, TEMPLATE_PATH, static_file
 import csv
 import threading
-
+import nbformat
+from nbconvert.preprocessors import ExecutePreprocessor
 if __name__ == '__main__':
-    
+    log_path = './logs/'
+    notebook_filename = "MUI_Test_Evaluation.ipynb"
+
     @route("/log/", method="POST")
     def log():
         log_data = request.body.getvalue().decode('utf-8')
@@ -14,10 +17,29 @@ if __name__ == '__main__':
 
         pid = rows[1][1]
         condition_id = rows[1][2]
+        run_id = rows[1][3]
 
-        log_file = open(pid + "-" + condition_id + ".csv", "a")
+        # Write csv data to file
+        log_file = open(log_path + pid + "-" + condition_id + ".csv", "a")
         log_file.write(log_data)
         log_file.close()
+
+        
+    @route("/logFinish/", method='POST')
+    def log_finish():
+        pid_finished = request.body.getvalue().decode('utf-8')
+        print(pid_finished)
+  
+        # Restart and run all cells
+        with open(log_path + notebook_filename) as f:
+            nb = nbformat.read(f, as_version=4)
+
+        ep = ExecutePreprocessor(timeout=600, kernel_name='python3')
+        ep.preprocess(nb, {'metadata': {'path': log_path}})
+        with open(log_path + notebook_filename, 'w', encoding='utf-8') as f:
+            nbformat.write(nb, f)
+
+
 
     @route("/")
     def server_static():

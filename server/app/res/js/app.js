@@ -70,6 +70,7 @@ function setConfigurationParameters(){
             CURSOR_SPEED_Y = 1.5;
             break;
         case 4:
+          
             alert("This is it, you're done!");
             break;
     }
@@ -313,6 +314,19 @@ function post(logData) {
         url: "http://localhost:3333/log/",
         type: "POST",
         data: logData,
+        contentType: "text/csv",
+        dataType: "txt",
+        success: function(data) {
+            alert(data);
+        }
+    });
+}
+
+function postRunsComplete() {
+    $.ajax({
+        url: "http://localhost:3333/logFinish/",
+        type: "POST",
+        data: pid,
         contentType: "text/csv",
         dataType: "txt",
         success: function(data) {
