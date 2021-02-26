@@ -7,7 +7,9 @@ let timeAtLastSuccessfulClick,
     UI_SPEED_Y,
     CURSOR_SPEED_X = 1,
     CURSOR_SPEED_Y = 1,
-    rectConfig;
+    rectConfig
+    startScreenIsActive = true,
+    hasAlreadyParticipated = false;
 
 //Cursor and Target element
 let customCursor,
@@ -15,7 +17,8 @@ let customCursor,
 
 //Loged Data    
 let csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,timestampCollision,timestampClick,mouseIsInsideElement,targetX,targetY,targetWidth,targetHeight,cursorX,cursorY",
-    pid = prompt("Please enter your PID"),
+    //pid = prompt("Please enter your PID"),
+    pid = 111,
     condition_id = 0,
     run_id = 0,
     timestampConditionStart,
@@ -33,15 +36,12 @@ let csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,t
     dataHasBeenSentToServer = false;
 //One Chunk equals 10 runs
 let NUMBER_OF_CHUNKS_TO_BE_SENT = 10;
-    
 
-//Scene setup
-$.getJSON('http://localhost:3333/res/jsonConfigFiles/rect1.json', function (jsonData) {
-    rectConfig = JSON.parse(JSON.stringify(jsonData));
-    setupScene();
-});
 
-function setupScene(){
+//setupScene();
+setupStartScreen();
+
+function setupScene() {
     setConfigurationParameters();
     createFrame();
     createRect();
@@ -49,8 +49,14 @@ function setupScene(){
     timeAtLoadingComplete = Date.now();
 }
 
-function setConfigurationParameters(){
-    switch (condition_id){
+function setupStartScreen() {
+    startScreenIsActive = true;
+    createFrame();
+    createStartScreenUi();
+}
+
+function setConfigurationParameters() {
+    switch (condition_id) {
         case 0:
             UI_SPEED_X = 0;
             UI_SPEED_Y = 0;
@@ -70,7 +76,7 @@ function setConfigurationParameters(){
             CURSOR_SPEED_Y = 1.5;
             break;
         case 4:
-          
+            postRunsComplete();
             alert("This is it, you're done!");
             break;
     }
@@ -80,76 +86,85 @@ function setConfigurationParameters(){
 //Listeners
 frame.addEventListener('mousemove', event => {
     //Initiate cursor at start
-    if (cursorX == null || cursorY == null) {
-        cursorX = event.clientX;
-        cursorY = event.clientY;  
-    } else {
-        if(event.movementX != 0 || event.movementY != 0){
-            moveCursor(event.movementX, event.movementY);
-            moveUI(event.movementX, event.movementY);
-            logAllData();
+
+    if (!startScreenIsActive) {
+        if (cursorX == null || cursorY == null) {
+            cursorX = event.clientX;
+            cursorY = event.clientY;
+        } else {
+            if (event.movementX != 0 || event.movementY != 0) {
+                moveCursor(event.movementX, event.movementY);
+
+                moveUI(event.movementX, event.movementY);
+                logAllData();
+
+            }
+
         }
-        
     }
+
+
 
 });
 
 frame.addEventListener('click', event => {
-    if (cursorIsInsideOfElement(targetElement)) {
-        //clicked element
-        cursorInside = true;
-        timestampClick = Date.now();
-        logAllData();
-        //setup new scene
-        setupNewScene();
-    } else {
-        //clicked canvas
-        timestampClick = Date.now();
-        cursorInside = false;
-        logAllData();
-
+    if (!startScreenIsActive) {
         //request Pointer Lock
         frame.requestPointerLock = frame.requestPointerLock ||
-        element.mozRequestPointerLock ||
-        element.webkitRequestPointerLock;
+            element.mozRequestPointerLock ||
+            element.webkitRequestPointerLock;
         frame.requestPointerLock();
-    }
 
+
+        if (cursorIsInsideOfElement(targetElement)) {
+            //clicked element
+            cursorInside = true;
+            timestampClick = Date.now();
+            logAllData();
+            //setup new scene
+            setupNewScene();
+        } else {
+            //clicked canvas
+            timestampClick = Date.now();
+            cursorInside = false;
+            logAllData();
+        }
+    }
 });
 
 
 //General movement logic
-function moveCursor(mouseMovementX, mouseMovementY){
+function moveCursor(mouseMovementX, mouseMovementY) {
     customCursorTop = parseInt(customCursor.style.top),
-    customCursorLeft = parseInt(customCursor.style.left),
+        customCursorLeft = parseInt(customCursor.style.left),
 
-    cursorX = limitNumberWithinRange((customCursorLeft + mouseMovementX * CURSOR_SPEED_X), 0, 1000 - 10),
-    cursorY = limitNumberWithinRange((customCursorTop + mouseMovementY * CURSOR_SPEED_X), 0, 750 - 10);
+        cursorX = limitNumberWithinRange((customCursorLeft + mouseMovementX * CURSOR_SPEED_X), 0, 1000 - 10),
+        cursorY = limitNumberWithinRange((customCursorTop + mouseMovementY * CURSOR_SPEED_X), 0, 750 - 10);
 
     customCursor.style.left = cursorX + 'px',
-    customCursor.style.top = cursorY + 'px';
+        customCursor.style.top = cursorY + 'px';
 }
 
-function moveUI(mouseMovementX, mouseMovementY){
+function moveUI(mouseMovementX, mouseMovementY) {
     let xMovement,
         yMovement;
 
     //Don't move UI in x or y direction if the cursor is at the left/right or top/bottom edge
 
-    if (cursorX >= (parseInt(frame.style.width) - parseInt(customCursor.style.width)) || cursorX <= 0){
+    if (cursorX >= (parseInt(frame.style.width) - parseInt(customCursor.style.width)) || cursorX <= 0) {
         xMovement = 0,
-        yMovement = mouseMovementY;
-    }   else if(cursorY >= (parseInt(frame.style.height) - parseInt(customCursor.style.height)) || cursorY <= 0){
+            yMovement = mouseMovementY;
+    } else if (cursorY >= (parseInt(frame.style.height) - parseInt(customCursor.style.height)) || cursorY <= 0) {
         xMovement = mouseMovementX,
-        yMovement = 0;
-    }   else {
+            yMovement = 0;
+    } else {
         xMovement = mouseMovementX,
-        yMovement = mouseMovementY;
+            yMovement = mouseMovementY;
     }
 
     let targetElementTop = parseInt(targetElement.style.top),
         targetElementLeft = parseInt(targetElement.style.left);
-    
+
     if (cursorIsInsideOfElement(targetElement)) {
         //Cursor is inside element
         if (!cursorInside) {
@@ -160,15 +175,15 @@ function moveUI(mouseMovementX, mouseMovementY){
     } else {
         //Cursor is outside of element
         cursorInside = false;
-        newX = limitNumberWithinRange(targetElementLeft + (-1 * xMovement)*UI_SPEED_X, 0, parseInt(frame.style.width) - parseInt(targetElement.style.width));
-        newY = limitNumberWithinRange(targetElementTop + (-1 * yMovement)*UI_SPEED_Y, 0, parseInt(frame.style.height) - parseInt(targetElement.style.height));
-        targetElement.style.left = newX + 'px';  
+        newX = limitNumberWithinRange(targetElementLeft + (-1 * xMovement) * UI_SPEED_X, 0, parseInt(frame.style.width) - parseInt(targetElement.style.width));
+        newY = limitNumberWithinRange(targetElementTop + (-1 * yMovement) * UI_SPEED_Y, 0, parseInt(frame.style.height) - parseInt(targetElement.style.height));
+        targetElement.style.left = newX + 'px';
         targetElement.style.top = newY + 'px';
-        } 
+    }
 }
 
 //Functions to create/delete elements
-function createFrame(){
+function createFrame() {
     frame.style.width = 1000 + 'px';
     frame.style.height = 750 + 'px';
     frame.style.background = "blue";
@@ -176,7 +191,68 @@ function createFrame(){
     frame.style.display = 'inline';
 }
 
-function createCustomCursor(x, y){
+
+function createStartScreenUi() {
+    var form = document.createElement("form");
+    form.id = "inputForm";
+
+    form.style.width = 200 + "px";
+    form.style.height = 200 + "px";
+    form.style.marginLeft = "auto";
+    form.style.marginRight = "auto";
+    form.style.marginTop = 300 + 'px';
+    form.style.alignItems = "center";
+    frame.appendChild(form); // put it into the DOM
+
+    createTextInput(form, "Vorname");
+    createTextInput(form, "Nachname");
+    createTextInput(form, "NDS-Account-Name");
+
+    createButton(form, "StartTest");
+}
+function createButton(form, nameOfButton) {
+    var btn = document.createElement("BUTTON");
+    btn.type = "button"
+    btn.innerHTML = "Start Test";
+    btn.style.id = nameOfButton;
+    btn.style.marginTop = 25 + "px";
+    btn.onclick = getPID;
+    form.appendChild(btn);
+}
+
+function getPID() {
+    let formCsvData = getCsvDataFromForm();
+    getPidCall(formCsvData)
+}
+
+function getCsvDataFromForm() {
+    let formElements = document.getElementById("inputForm").elements,
+        i,
+        formDataCsvString = "";
+    for (i = 0; i < 3; i++) {
+        formDataCsvString = formDataCsvString + formElements[i].value;
+        if (i != 2) {
+            formDataCsvString = formDataCsvString + ",";
+        }
+    }
+    return formDataCsvString;
+}
+
+function createTextInput(form, nameOfInput) {
+    var textInputPara = document.createElement("p");
+    var textInputNode = document.createTextNode(nameOfInput + ":");
+    textInputPara.appendChild(textInputNode);
+    form.appendChild(textInputPara);
+
+    var textInput = document.createElement("input");
+    textInput.style.name = nameOfInput;
+    textInput.type = "text";
+    textInput.className = "registerForm"; // set the CSS class
+    textInput.style.id = nameOfInput;
+    form.appendChild(textInput); // put it into the DOM
+}
+
+function createCustomCursor(x, y) {
     customCursor = document.createElement('targetElement');
     customCursor.id = "customCursor";
     customCursor.style.width = 10 + 'px';
@@ -207,10 +283,10 @@ function createRect() {
     targetElement.style.left = newX + "px";
     targetElement.style.top = newY + "px";
     targetElement.style.transition = '0.1s';
-    frame.appendChild(targetElement); 
+    frame.appendChild(targetElement);
 }
 
-function setupNewScene(){
+function setupNewScene() {
     removeElement(targetElement.id);
     removeElement(customCursor.id)
     createRect();
@@ -230,78 +306,78 @@ function removeElement(elementId) {
 
 
 //Functions to calculate coordinates
-function getNewCursorCoordinates(elementToSpawnAround){
-    let centerX = parseInt(elementToSpawnAround.style.left) - parseInt(customCursor.style.width) / 2 + parseInt(elementToSpawnAround.style.width)/2,
-        centerY = parseInt(elementToSpawnAround.style.top) - parseInt(customCursor.style.height) / 2 + parseInt(elementToSpawnAround.style.height)/2,
-  
+function getNewCursorCoordinates(elementToSpawnAround) {
+    let centerX = parseInt(elementToSpawnAround.style.left) - parseInt(customCursor.style.width) / 2 + parseInt(elementToSpawnAround.style.width) / 2,
+        centerY = parseInt(elementToSpawnAround.style.top) - parseInt(customCursor.style.height) / 2 + parseInt(elementToSpawnAround.style.height) / 2,
+
         cursorStartX = centerX + 300,
         cursorStartY = centerY,
         coords = rotateAroundCenter(centerX, centerY, cursorStartX, cursorStartY);
     return coords;
 }
 
-function rotateAroundCenter(centerX, centerY, objectToRotateX, objectToRotateY){
-    let rotatedCoords = Array.from({length: 2}),
+function rotateAroundCenter(centerX, centerY, objectToRotateX, objectToRotateY) {
+    let rotatedCoords = Array.from({ length: 2 }),
         rad = degreesToRadians(getRndInteger(0, 360)),
         sin = Math.sin(rad),
-        cos =  Math.cos(rad);
+        cos = Math.cos(rad);
 
-        rotatedCoords[0] = cos * (objectToRotateX - centerX) - sin * (objectToRotateY - centerY) + centerX;
-        rotatedCoords[1] = sin * (objectToRotateX - centerX) - cos * (objectToRotateY - centerY) + centerY;
+    rotatedCoords[0] = cos * (objectToRotateX - centerX) - sin * (objectToRotateY - centerY) + centerX;
+    rotatedCoords[1] = sin * (objectToRotateX - centerX) - cos * (objectToRotateY - centerY) + centerY;
 
-        //Recalculate, if new coordinates are not on canvas
-        while (rotatedCoords[0] > parseInt(frame.style.width) || rotatedCoords[0] < 0 || rotatedCoords[1] > parseInt(frame.style.height) || rotatedCoords[1] < 0){
-            rotatedCoords = rotateAroundCenter(centerX, centerY, objectToRotateX, objectToRotateY);
-        }
+    //Recalculate, if new coordinates are not on canvas
+    while (rotatedCoords[0] > parseInt(frame.style.width) || rotatedCoords[0] < 0 || rotatedCoords[1] > parseInt(frame.style.height) || rotatedCoords[1] < 0) {
+        rotatedCoords = rotateAroundCenter(centerX, centerY, objectToRotateX, objectToRotateY);
+    }
 
-    return rotatedCoords;  
+    return rotatedCoords;
 }
 
 //Logging
-function logAllData(){
+function logAllData() {
     let timestampLogEntry = Date.now(),
-    targetWidth = targetElement.style.width,
-    targetHeight = targetElement.style.height;
+        targetWidth = targetElement.style.width,
+        targetHeight = targetElement.style.height;
 
     //Number of log entries to be recorded
-    if((run_id % 10 == 0) && run_id != 0){
-        
-        if(chunksSentToServer < NUMBER_OF_CHUNKS_TO_BE_SENT && !dataHasBeenSentToServer){
+    if ((run_id % 10 == 0) && run_id != 0) {
+
+        if (chunksSentToServer < NUMBER_OF_CHUNKS_TO_BE_SENT && !dataHasBeenSentToServer) {
             post(csvContent);
             console.log(csvContent);
             chunksSentToServer = chunksSentToServer + 1;
             csvContent = "";
-            csvContentSize = 1; 
+            csvContentSize = 1;
             dataHasBeenSentToServer = true;
-        } else if(chunksSentToServer == NUMBER_OF_CHUNKS_TO_BE_SENT){
+        } else if (chunksSentToServer == NUMBER_OF_CHUNKS_TO_BE_SENT) {
             csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,timestampCollision,timestampClick,mouseIsInsideElement,targetX,targetY,targetWidth,targetHeight,cursorX,cursorY";
             condition_id = condition_id + 1;
             run_id = 0;
             csvContentSize = 0;
             chunksSentToServer = 0;
             setConfigurationParameters();
-        } 
+        }
     } else {
         dataHasBeenSentToServer = false;
     }
 
     //Do not log first run, since pointer lock has to be requested first and the run starts immediately after the page loads 
     //TODO: Implement start screen
-    if(run_id > 0){
+    if (run_id > 0) {
         let logString = timestampLogEntry + "," +
-        pid + "," +
-        condition_id + "," +
-        run_id + "," +
-        timestampConditionStart + "," +
-        timestampCollision + "," +
-        timestampClick + "," +
-        cursorInside + "," +
-        newX + "," +
-        newY + "," +
-        targetWidth + "," +
-        targetHeight + "," +
-        cursorX + "," +
-        cursorY;
+            pid + "," +
+            condition_id + "," +
+            run_id + "," +
+            timestampConditionStart + "," +
+            timestampCollision + "," +
+            timestampClick + "," +
+            cursorInside + "," +
+            newX + "," +
+            newY + "," +
+            targetWidth + "," +
+            targetHeight + "," +
+            cursorX + "," +
+            cursorY;
 
         csvContent = csvContent + "\n" + logString;
         console.log(run_id);
@@ -309,60 +385,101 @@ function logAllData(){
     csvContentSize = csvContentSize + 1;
 }
 
+function removeStartScreeen() {
+    $('#inputForm').remove();
+}
+
 function post(logData) {
+if(!hasAlreadyParticipated){
     $.ajax({
         url: "http://localhost:3333/log/",
         type: "POST",
         data: logData,
         contentType: "text/csv",
         dataType: "txt",
-        success: function(data) {
+        success: function (data) {
             alert(data);
         }
     });
+} 
+}
+
+function requestLock() {
+    frame.requestPointerLock = frame.requestPointerLock ||
+        element.mozRequestPointerLock ||
+        element.webkitRequestPointerLock;
+    frame.requestPointerLock();
+
+}
+
+function getPidCall(formCsvData) {
+    $.ajax({
+        url: "http://localhost:3333/registerPID/",
+        type: "POST",
+        data: formCsvData,
+        contentType: "text",
+        dataType: "text",
+        async: true,
+        success: function (response) {
+            if (isNaN(response)){
+                hasAlreadyParticipated = true
+                console.log(hasAlreadyParticipated)
+            }
+            pid = response;
+            console.log("code: " + response)
+
+            removeStartScreeen()
+            startScreenIsActive = false
+            setupScene()
+            requestLock();
+        }
+    });
+
 }
 
 function postRunsComplete() {
-    $.ajax({
-        url: "http://localhost:3333/logFinish/",
-        type: "POST",
-        data: pid,
-        contentType: "text/csv",
-        dataType: "txt",
-        success: function(data) {
-            alert(data);
-        }
-    });
+    if(!hasAlreadyParticipated){
+        $.ajax({
+            url: "http://localhost:3333/logFinish/",
+            type: "POST",
+            data: pid,
+            contentType: "text/csv",
+            dataType: "txt",
+            success: function (data) {
+                alert(data);
+            }
+        });
+    }
 }
 
 
 //Helper functions
 function getRndInteger(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) ) + min;
-  }
-  
-function degreesToRadians(degrees){
-    var pi = Math.PI;
-    return degrees * (pi/180);
-  }
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
-function limitNumberWithinRange(num, min, max){
+function degreesToRadians(degrees) {
+    var pi = Math.PI;
+    return degrees * (pi / 180);
+}
+
+function limitNumberWithinRange(num, min, max) {
     const MIN = min || 1;
     const MAX = max || 20;
     const parsed = parseInt(num)
     return Math.min(Math.max(parsed, MIN), MAX)
 }
 
-function cursorIsInsideOfElement(elementToCheck){
+function cursorIsInsideOfElement(elementToCheck) {
     cursor = document.getElementById("customCursor");
 
     let targetHeightCurrent = parseInt(elementToCheck.style.height),
-    targetWidthCurrent = parseInt(elementToCheck.style.width);
+        targetWidthCurrent = parseInt(elementToCheck.style.width);
 
-    if((cursorX > newX && cursorY > newY) && (cursorX < newX + targetHeightCurrent && cursorY < newY + targetWidthCurrent)){
+    if ((cursorX > newX && cursorY > newY) && (cursorX < newX + targetHeightCurrent && cursorY < newY + targetWidthCurrent)) {
         return true;
 
-    }   else {
+    } else {
         return false;
     }
 }

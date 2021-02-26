@@ -1,11 +1,47 @@
 from bottle import route, run, request, template, TEMPLATE_PATH, static_file
 import csv
+from csv import reader
+from csv import writer
 import threading
 import nbformat
+import shutil, sys, os
 from nbconvert.preprocessors import ExecutePreprocessor
 if __name__ == '__main__':
     log_path = './logs/'
+    finished_log_path = './logs/finishedLogs/'
+    failed_log_path = './logs/failedLogs/'
     notebook_filename = "MUI_Test_Evaluation.ipynb"
+
+    @route("/registerPID/", method='POST')
+    def register_PID():
+        register_data = request.body.getvalue().decode('utf-8')
+        register_values = []
+        register_values.append(register_data.split(','))
+        print(register_values[0][2])
+
+        with open('pidList.csv', newline='') as csvfile:
+            reader = csv.DictReader(csvfile)
+            maxID = -1
+
+            for row in reader:
+                maxID += 1
+                if row['NDS'] == register_values[0][2]:
+                    if row['hasFinished'] == str(0):
+                        failed_pid = row['ID']
+                        for x in range(4):
+                            file_path = log_path + failed_pid + '-' + str(x) + ".csv"
+                            if os.path.isfile(file_path):
+                                shutil.move(file_path,failed_log_path + failed_pid + '-' + str(x) + ".csv")
+                        print("re play: " + str(maxID))
+                        return str(maxID)
+                    else:
+                        return "f1"
+            with open("pidList.csv", "a") as csvfile:
+                id = maxID + 1
+                writer = csv.writer(csvfile, delimiter=',')
+                writer.writerow([register_values[0][0],register_values[0][1],register_values[0][2],id,0])
+                return str(id)
+        
 
     @route("/log/", method="POST")
     def log():
@@ -24,12 +60,31 @@ if __name__ == '__main__':
         log_file.write(log_data)
         log_file.close()
 
-        
     @route("/logFinish/", method='POST')
     def log_finish():
         pid_finished = request.body.getvalue().decode('utf-8')
         print(pid_finished)
+
+        # Move Files to finishedLogs Folder
+        for x in range(4):
+            file_path = log_path + pid_finished + '-' + str(x) + ".csv"
+            if os.path.isfile(file_path):
+                shutil.move(file_path,finished_log_path + pid_finished+ '-' + str(x) + "-f" + ".csv")
   
+        # Update PID list hasFinished
+        f = open('/Users/alexweichart/Documents/GitHub/Magnetic-UI-Evaluation-Kit/server/pidList.csv', "r+")
+        line_to_update = int(pid_finished) + 1
+        with f:
+            r = csv.reader(f) 
+            split = list(r)
+            split[line_to_update][4] = '1'
+            writer = csv.writer(f)
+            f.seek(0)
+            writer.writerows(split)
+            f.truncate()
+            f.close()
+
+
         # Restart and run all cells
         with open(log_path + notebook_filename) as f:
             nb = nbformat.read(f, as_version=4)
