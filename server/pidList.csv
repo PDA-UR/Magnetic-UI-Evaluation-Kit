@@ -1,7 +1,3 @@
-Vorname,Nachname,NDS,ID,hasFinished
-alex,alex,alt39553,0,1
-alex,alex,alt32532523,1,1
-wefw,wefw,ewfw323r,2,1
-ewd,wded,edew43,3,1
-dwedw,dewdewe,ewdwed333,4,1
-dadw,wadawd,wadww33,5,1
+Beruf,Geschlecht,Alter,ID,hasFinished,uniqueBrowserID
+Student,Männlich,20,0,1,ht03b78zy
+Bauarbeiter,Weiblich,123,1,1,emxeemmzi

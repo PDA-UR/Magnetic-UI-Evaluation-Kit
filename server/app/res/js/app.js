@@ -35,7 +35,7 @@ let csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,t
     csvContentSize = 0,
     dataHasBeenSentToServer = false;
 //One Chunk equals 10 runs
-let NUMBER_OF_CHUNKS_TO_BE_SENT = 10;
+let NUMBER_OF_CHUNKS_TO_BE_SENT = 1;
 
 
 //setupScene();
@@ -186,7 +186,7 @@ function moveUI(mouseMovementX, mouseMovementY) {
 function createFrame() {
     frame.style.width = 1000 + 'px';
     frame.style.height = 750 + 'px';
-    frame.style.background = "blue";
+    frame.style.background = "black";
     frame.style.position = 'fixed';
     frame.style.display = 'inline';
 }
@@ -204,9 +204,9 @@ function createStartScreenUi() {
     form.style.alignItems = "center";
     frame.appendChild(form); // put it into the DOM
 
-    createTextInput(form, "Vorname");
-    createTextInput(form, "Nachname");
-    createTextInput(form, "NDS-Account-Name");
+    createTextInput(form, "Beruf");
+    createTextInput(form, "Geschlecht");
+    createTextInput(form, "Alter");
 
     createButton(form, "StartTest");
 }
@@ -221,8 +221,8 @@ function createButton(form, nameOfButton) {
 }
 
 function getPID() {
-    let formCsvData = getCsvDataFromForm();
-    getPidCall(formCsvData)
+    let formCsvDataWithUniqueID = getCsvDataFromForm() + "," + getUniqueBrowserID();
+    getPidCall(formCsvDataWithUniqueID)
 }
 
 function getCsvDataFromForm() {
@@ -240,6 +240,7 @@ function getCsvDataFromForm() {
 
 function createTextInput(form, nameOfInput) {
     var textInputPara = document.createElement("p");
+    textInputPara.style.color = "white";
     var textInputNode = document.createTextNode(nameOfInput + ":");
     textInputPara.appendChild(textInputNode);
     form.appendChild(textInputPara);
@@ -255,9 +256,11 @@ function createTextInput(form, nameOfInput) {
 function createCustomCursor(x, y) {
     customCursor = document.createElement('targetElement');
     customCursor.id = "customCursor";
+    let customCursorTexture = document.createElement('IMG');
+    customCursorTexture.src = "http://www.rw-designer.com/cursor-extern.php?id=150274";
+    customCursor.appendChild(customCursorTexture)
     customCursor.style.width = 10 + 'px';
     customCursor.style.height = 10 + 'px';
-    customCursor.style.background = "yellow";
     customCursor.style.position = 'absolute';
     customCursor.display = 'inline';
     cursorX = x;
@@ -483,6 +486,17 @@ function cursorIsInsideOfElement(elementToCheck) {
         return false;
     }
 }
+
+function getUniqueBrowserID() {
+    let magneticUiLocalStorageKey = "uniqueMuiBrowserID"
+    if (localStorage.getItem(magneticUiLocalStorageKey) === null) {
+        let newUniqueID = Math.random().toString(36).substr(2, 9);
+        localStorage.setItem(magneticUiLocalStorageKey, newUniqueID);
+        return newUniqueID
+      } else {
+        return localStorage.getItem(magneticUiLocalStorageKey)
+      }
+  };
 
 
 

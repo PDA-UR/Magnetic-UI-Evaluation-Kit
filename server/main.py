@@ -17,7 +17,7 @@ if __name__ == '__main__':
         register_data = request.body.getvalue().decode('utf-8')
         register_values = []
         register_values.append(register_data.split(','))
-        print(register_values[0][2])
+        print(register_values[0][3])
 
         with open('pidList.csv', newline='') as csvfile:
             reader = csv.DictReader(csvfile)
@@ -25,7 +25,8 @@ if __name__ == '__main__':
 
             for row in reader:
                 maxID += 1
-                if row['NDS'] == register_values[0][2]:
+                print(register_values[0][3])
+                if row['uniqueBrowserID'] == register_values[0][3]:
                     if row['hasFinished'] == str(0):
                         failed_pid = row['ID']
                         for x in range(4):
@@ -39,7 +40,7 @@ if __name__ == '__main__':
             with open("pidList.csv", "a") as csvfile:
                 id = maxID + 1
                 writer = csv.writer(csvfile, delimiter=',')
-                writer.writerow([register_values[0][0],register_values[0][1],register_values[0][2],id,0])
+                writer.writerow([register_values[0][0],register_values[0][1],register_values[0][2],id,0,register_values[0][3]])
                 return str(id)
         
 
