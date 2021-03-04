@@ -2,7 +2,6 @@ from bottle import route, run, request, template, TEMPLATE_PATH, static_file
 import csv
 from csv import reader
 from csv import writer
-import run_notebook
 import threading
 import nbformat
 import shutil, sys, os
