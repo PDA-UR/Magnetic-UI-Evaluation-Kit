@@ -8,7 +8,7 @@ let timeAtLastSuccessfulClick,
     CURSOR_SPEED_X = 1,
     CURSOR_SPEED_Y = 1,
     rectConfig
-    startScreenIsActive = true,
+startScreenIsActive = true,
     hasAlreadyParticipated = false;
 
 //Cursor and Target element
@@ -204,9 +204,9 @@ function createStartScreenUi() {
     form.style.alignItems = "center";
     frame.appendChild(form); // put it into the DOM
 
-    createTextInput(form, "Beruf");
-    createTextInput(form, "Geschlecht");
-    createTextInput(form, "Alter");
+    createTextInput(form, "Beruf", 0);
+    createTextInput(form, "Geschlecht", 0);
+    createTextInput(form, "Alter", 1);
 
     createButton(form, "StartTest");
 }
@@ -238,7 +238,7 @@ function getCsvDataFromForm() {
     return formDataCsvString;
 }
 
-function createTextInput(form, nameOfInput) {
+function createTextInput(form, nameOfInput, isAge) {
     var textInputPara = document.createElement("p");
     textInputPara.style.color = "white";
     var textInputNode = document.createTextNode(nameOfInput + ":");
@@ -249,6 +249,17 @@ function createTextInput(form, nameOfInput) {
     textInput.style.name = nameOfInput;
     textInput.type = "text";
     textInput.className = "registerForm"; // set the CSS class
+
+    if (isAge) {
+        textInput.addEventListener('input', restrictNumber);
+        textInput.maxLength = "3"
+        function restrictNumber(e) {
+            var newValue = this.value.replace(new RegExp(/[^\d]/, 'ig'), "");
+            this.value = newValue;
+        }
+    } else {
+        textInput.maxLength = "24"
+    }
     textInput.style.id = nameOfInput;
     form.appendChild(textInput); // put it into the DOM
 }
@@ -393,18 +404,18 @@ function removeStartScreeen() {
 }
 
 function post(logData) {
-if(!hasAlreadyParticipated){
-    $.ajax({
-        url: "http://localhost:3333/log/",
-        type: "POST",
-        data: logData,
-        contentType: "text/csv",
-        dataType: "txt",
-        success: function (data) {
-            alert(data);
-        }
-    });
-} 
+    if (!hasAlreadyParticipated) {
+        $.ajax({
+            url: "http://localhost:3333/log/",
+            type: "POST",
+            data: logData,
+            contentType: "text/csv",
+            dataType: "txt",
+            success: function (data) {
+                alert(data);
+            }
+        });
+    }
 }
 
 function requestLock() {
@@ -424,7 +435,7 @@ function getPidCall(formCsvData) {
         dataType: "text",
         async: true,
         success: function (response) {
-            if (isNaN(response)){
+            if (isNaN(response)) {
                 hasAlreadyParticipated = true
                 console.log(hasAlreadyParticipated)
             }
@@ -441,7 +452,7 @@ function getPidCall(formCsvData) {
 }
 
 function postRunsComplete() {
-    if(!hasAlreadyParticipated){
+    if (!hasAlreadyParticipated) {
         $.ajax({
             url: "http://localhost:3333/logFinish/",
             type: "POST",
@@ -493,10 +504,10 @@ function getUniqueBrowserID() {
         let newUniqueID = Math.random().toString(36).substr(2, 9);
         localStorage.setItem(magneticUiLocalStorageKey, newUniqueID);
         return newUniqueID
-      } else {
+    } else {
         return localStorage.getItem(magneticUiLocalStorageKey)
-      }
-  };
+    }
+};
 
 
 
