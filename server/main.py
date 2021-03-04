@@ -2,6 +2,7 @@ from bottle import route, run, request, template, TEMPLATE_PATH, static_file
 import csv
 from csv import reader
 from csv import writer
+import run_notebook
 import threading
 import nbformat
 import shutil, sys, os
@@ -29,7 +30,7 @@ if __name__ == '__main__':
                 if row['uniqueBrowserID'] == register_values[0][3]:
                     if row['hasFinished'] == str(0):
                         failed_pid = row['ID']
-                        for x in range(4):
+                        for x in range(6):
                             file_path = log_path + failed_pid + '-' + str(x) + ".csv"
                             if os.path.isfile(file_path):
                                 shutil.move(file_path,failed_log_path + failed_pid + '-' + str(x) + ".csv")
@@ -67,7 +68,7 @@ if __name__ == '__main__':
         print(pid_finished)
 
         # Move Files to finishedLogs Folder
-        for x in range(4):
+        for x in range(6):
             file_path = log_path + pid_finished + '-' + str(x) + ".csv"
             if os.path.isfile(file_path):
                 shutil.move(file_path,finished_log_path + pid_finished+ '-' + str(x) + "-f" + ".csv")
@@ -84,17 +85,6 @@ if __name__ == '__main__':
             writer.writerows(split)
             f.truncate()
             f.close()
-
-
-        # Restart and run all cells
-        with open(log_path + notebook_filename) as f:
-            nb = nbformat.read(f, as_version=4)
-
-        ep = ExecutePreprocessor(timeout=600, kernel_name='python3')
-        ep.preprocess(nb, {'metadata': {'path': log_path}})
-        with open(log_path + notebook_filename, 'w', encoding='utf-8') as f:
-            nbformat.write(nb, f)
-
 
 
     @route("/")

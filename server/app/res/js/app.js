@@ -35,7 +35,7 @@ let csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,t
     csvContentSize = 0,
     dataHasBeenSentToServer = false;
 //One Chunk equals 10 runs
-let NUMBER_OF_CHUNKS_TO_BE_SENT = 1;
+let NUMBER_OF_CHUNKS_TO_BE_SENT = 10;
 
 
 //setupScene();
@@ -62,20 +62,29 @@ function setConfigurationParameters() {
             UI_SPEED_Y = 0;
             break;
         case 1:
+            UI_SPEED_X = 0.25;
+            UI_SPEED_Y = 0.25;
+            break;
+        case 2:
             UI_SPEED_X = 0.5;
             UI_SPEED_Y = 0.5;
             break;
-        case 2:
+        case 3:
+            UI_SPEED_X = 0.75;
+            UI_SPEED_Y = 0.75;
+            break;
+        case 4:
             UI_SPEED_X = 1;
             UI_SPEED_Y = 1;
             break;
-        case 3:
+        case 5:
             UI_SPEED_X = 0;
             UI_SPEED_Y = 0;
             CURSOR_SPEED_X = 1.5;
             CURSOR_SPEED_Y = 1.5;
             break;
-        case 4:
+
+        case 6:
             postRunsComplete();
             alert("This is it, you're done!");
             break;
@@ -274,12 +283,15 @@ function createCustomCursor(x, y) {
     customCursor.style.height = 10 + 'px';
     customCursor.style.position = 'absolute';
     customCursor.display = 'inline';
+    customCursor.background = 'white'
     cursorX = x;
     cursorY = y;
     customCursor.style.left = x + "px";
     customCursor.style.top = y + "px";
     frame.appendChild(customCursor);
 }
+
+
 
 function createRect() {
     targetElement = document.createElement('targetElement');
@@ -301,13 +313,14 @@ function createRect() {
 }
 
 function setupNewScene() {
+    run_id = run_id + 1;
     removeElement(targetElement.id);
     removeElement(customCursor.id)
     createRect();
     let newCursorCoords = getNewCursorCoordinates(document.getElementById("rect1"));
     createCustomCursor(newCursorCoords[0], newCursorCoords[1]);
     cursorInside = false;
-    run_id = run_id + 1;
+    
     timestampConditionStart = Date.now();
     logAllData();
     console.log(run_id);
