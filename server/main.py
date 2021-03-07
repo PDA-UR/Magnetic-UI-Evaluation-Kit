@@ -40,7 +40,7 @@ if __name__ == '__main__':
             with open("pidList.csv", "a") as csvfile:
                 id = maxID + 1
                 writer = csv.writer(csvfile, delimiter=',')
-                writer.writerow([register_values[0][0],register_values[0][1],register_values[0][2],id,0,register_values[0][3]])
+                writer.writerow([register_values[0][0],register_values[0][1],register_values[0][2],id,0,register_values[0][3],register_values[0][4]])
                 return str(id)
         
 
