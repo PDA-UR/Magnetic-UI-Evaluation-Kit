@@ -9,7 +9,10 @@ let timeAtLastSuccessfulClick,
     CURSOR_SPEED_Y = 1,
     rectConfig
 startScreenIsActive = true,
-    hasAlreadyParticipated = false;
+    hasAlreadyParticipated = false,
+    conditionsCompleted = 0,
+    conditionsList = [],
+    languageIsEN = true;
 
 //Cursor and Target element
 let customCursor,
@@ -17,7 +20,6 @@ let customCursor,
 
 //Loged Data    
 let csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,timestampCollision,timestampClick,mouseIsInsideElement,targetX,targetY,targetWidth,targetHeight,cursorX,cursorY",
-    //pid = prompt("Please enter your PID"),
     pid = 111,
     condition_id = 0,
     run_id = 0,
@@ -35,24 +37,28 @@ let csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,t
     csvContentSize = 0,
     dataHasBeenSentToServer = false;
 //One Chunk equals 10 runs
-let NUMBER_OF_CHUNKS_TO_BE_SENT = 10;
+let NUMBER_OF_CHUNKS_TO_BE_SENT = 1;
 
 
 //setupScene();
 setupStartScreen();
 
 function setupScene() {
-    setConfigurationParameters();
-    createFrame();
-    createRect();
-    createCustomCursor(100, 100);
-    timeAtLoadingComplete = Date.now();
+        setConditionsList();
+        condition_id = conditionsList[conditionsCompleted]
+        console.log(condition_id)
+        setConfigurationParameters();
+        createFrame();
+        createRect();
+        createCustomCursor(100, 100);
+        timeAtLoadingComplete = Date.now();
+    
 }
 
 function setupStartScreen() {
     startScreenIsActive = true;
     createFrame();
-    createStartScreenUi();
+    createStartScreenText();
 }
 
 function setConfigurationParameters() {
@@ -86,7 +92,12 @@ function setConfigurationParameters() {
 
         case 6:
             postRunsComplete();
-            alert("This is it, you're done!");
+            if(languageIsEN){
+                alert("All runs completed, you can leave this website now!");
+            } else {
+                alert("Alle Durchläufe vollendet, Sie können die Website nun verlassen!");
+            } 
+            
             break;
     }
 }
@@ -201,6 +212,87 @@ function createFrame() {
 }
 
 
+function createStartScreenText() {
+    var div = document.createElement("div");
+    div.id = "startTextContainer"
+    div.style.background = "white"
+    div.style.marginLeft = "auto";
+    div.style.marginRight = "auto";
+    div.style.marginTop = 50 + 'px';
+    div.style.alignItems = "center";
+    div.style.height = 80 + "%"
+    div.style.width = 90 + "%"
+    div.style.paddingTop = 10 + "px"
+
+    var h3 = document.createElement("h3")
+    h3.style.textAlign = "center"
+    var t = document.createTextNode("Magnetic UI"); 
+    h3.appendChild(t)
+    div.appendChild(h3)
+
+    var p = document.createElement("textarea")
+    p.style.width = 80+ "%"
+    p.style.height = 450 + "px"
+    p.style.marginLeft = "auto";
+    p.style.marginRight = "auto";
+    p.style.display = "block"
+    p.style.textAlign = "center"
+    p.disabled = "true"
+    var introTextEN = "Hello and thank you for participating in our survey!\n\nThis study is a part of an ongoing research project of the BIDT junior research group ‘Physical Digital Affordances’ (https:\/\/hci.ur.de\/). By participating, you will help us to develop new user interfaces which make your work easier.\n\nIn this study, we want to investigate whether and how your click behaviour changes once an user interface moves in the opposite direction of your movements of the mouse cursor. \n\nWe will log your age, gender, and occupation information.\nDuring the study, your mouse movements and clicks, as well as your operating system, are automatically logged and stored by us. The data is collected completely anonymously and stored on a server at the University of Regensburg. It will not be possible to discern whether you participated in this study with the data we intend to log.\n\nIt  takes a maximum of 15 minutes to finish the study. Please make sure that  you are not interrupted during this time.\nPlease try to always click the given target as quickly and accurately as possible!\n\nBefore you start:\n- Make sure you are using a laptop or desktop pc\n- Resize your browser window so that the entire black background area can be seen\n\nIf you have any questions about the study or the research project, you can contact us via the following email addresses:\nmarie.sautmann@stud.uni-regensburg.de and juergen.hahn@ur.de.\n";
+    var introTextDE = "Hallo und vielen Dank für Ihre Teilnahme an unserer Studie!\n\nDiese Studie gliedert sich in ein laufendes Forschungsprojekt der BIDT-Nachwuchsforschungsgruppe ‘Physical Digital Affordances’ (https:\/\/hci.ur.de\/) ein. Ihre Teilnahme hilft uns dabei neue Benutzerschnittstellen zu entwickeln, die Ihnen Ihre Arbeit erleichtern sollen.\n\nMit dieser Studie wollen wir untersuchen, ob und wie sich Ihr Klickverhalten ändert, sobald eine Benutzeroberfläche sich entgegen Ihrer Bewegungen des Mauszeigers bewegt.\n\nIm Folgenden speichern wir Ihre Angaben zu Alter, Geschlecht und Beruf.\nWährend der Studie werden Ihre Mausbewegungen und Klicks, sowie ihr Betriebssystem automatisch gespeichert. Dies geschieht völlig anonym auf einem Server der Universität Regensburg. Ein Rückschluss auf Ihre Person ist zu keinem Zeitpunkt möglich.\n\nDie Teilnahme an der Studie dauert maximal 15 Minuten. Bitte stellen Sie sicher, dass Sie während dieser Zeit die Studie konzentriert und ohne Unterbrechungen durchführen können.\nBitte klicken Sie das vorgegebene Ziel immer so schnell und genau an wie möglich!\n\nBevor Sie die Studie starten:\n- Wechseln Sie zu einem Laptop oder Desktop Pc\n- Passen Sie das Browser Fenster so an, dass die komplette schwarze Hintergrundfläche zu sehen ist\n\nHaben Sie weitere Fragen zur Umfrage oder zum Forschungsprojekt können Sie die Durchführenden der Studie unter folgenden Emailadressen kontaktieren: marie.sautmann@stud.uni-regensburg.de und juergen.hahn@ur.de.\n";
+    var t2 = document.createTextNode(introTextEN); 
+    p.appendChild(t2)
+    div.appendChild(p)
+
+    var buttonContainer = document.createElement("div");
+    buttonContainer.style.left = 50 + "%"
+    buttonContainer.style.top = 50 + "%"
+    buttonContainer.style.textAlign = "center"
+
+    var startButton = document.createElement("button");
+    startButton.style.background = "#00cc66"
+    startButton.style.margin = 15 + "px"
+    startButton.style.padding = 10 + "px"
+    startButton.textContent = "Start now!"
+    startButton.onclick = function(){
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+        if (w < parseInt(frame.style.width) || h < parseInt(frame.style.height)){
+            if(languageIsEN){
+                alert("Please resize the browser window so that the entire black area can be seen!")
+            }   else {
+                alert("Bitte passen Sie das Browser Fenster so an, dass die komplette schwarze Fläche zu sehen ist!")
+            }
+        }   else{
+            div.remove()
+            createStartScreenUi()
+        }
+    }
+
+    var switchLanguageButton = document.createElement("button");
+    switchLanguageButton.style.margin = 15 + "px"
+    switchLanguageButton.style.padding = 10 + "px"
+    switchLanguageButton.textContent = "Change language to German"
+    switchLanguageButton.onclick = function(){
+        if (languageIsEN){
+            t2.nodeValue = introTextDE
+            switchLanguageButton.textContent = "Sprache zu Englisch wechseln"
+            startButton.textContent = "Jetzt beginnen!"
+            languageIsEN = false
+        }   else {
+            t2.nodeValue = introTextEN
+            switchLanguageButton.textContent = "Change language to German"
+            startButton.textContent = "Start now!"
+            languageIsEN = true
+        }
+    }
+
+    buttonContainer.appendChild(switchLanguageButton)
+    buttonContainer.appendChild(startButton)
+    div.appendChild(buttonContainer)
+    frame.appendChild(div)
+}
+
 function createStartScreenUi() {
     var form = document.createElement("form");
     form.id = "inputForm";
@@ -230,8 +322,16 @@ function createButton(form, nameOfButton) {
 }
 
 function getPID() {
-    let formCsvDataWithUniqueID = getCsvDataFromForm() + "," + getUniqueBrowserID() + "," + getOS();
-    getPidCall(formCsvDataWithUniqueID)
+    if (!isMobileDevice()){
+        let formCsvDataWithUniqueID = getCsvDataFromForm() + "," + getUniqueBrowserID() + "," + getOS();
+        getPidCall(formCsvDataWithUniqueID)
+    } else{
+        if(languageIsEN){
+            alert("Smartphones and tablets are not supported, please use a laptop or desktop pc.")
+        } else{
+            alert("Smartphones und Tablets werden nicht unterstützt, bitte nutzen Sie einen Laptop oder Desktop Pc.")
+        }
+    }
 }
 
 function getCsvDataFromForm() {
@@ -323,7 +423,6 @@ function setupNewScene() {
     
     timestampConditionStart = Date.now();
     logAllData();
-    console.log(run_id);
 }
 
 function removeElement(elementId) {
@@ -371,14 +470,14 @@ function logAllData() {
 
         if (chunksSentToServer < NUMBER_OF_CHUNKS_TO_BE_SENT && !dataHasBeenSentToServer) {
             post(csvContent);
-            console.log(csvContent);
             chunksSentToServer = chunksSentToServer + 1;
             csvContent = "";
             csvContentSize = 1;
             dataHasBeenSentToServer = true;
         } else if (chunksSentToServer == NUMBER_OF_CHUNKS_TO_BE_SENT) {
             csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,timestampCollision,timestampClick,mouseIsInsideElement,targetX,targetY,targetWidth,targetHeight,cursorX,cursorY";
-            condition_id = condition_id + 1;
+            conditionsCompleted = conditionsCompleted + 1;
+            condition_id = conditionsList[conditionsCompleted]
             run_id = 0;
             csvContentSize = 0;
             chunksSentToServer = 0;
@@ -407,7 +506,6 @@ function logAllData() {
             cursorY;
 
         csvContent = csvContent + "\n" + logString;
-        console.log(run_id);
     }
     csvContentSize = csvContentSize + 1;
 }
@@ -448,13 +546,11 @@ function getPidCall(formCsvData) {
         dataType: "text",
         async: true,
         success: function (response) {
+            pid = response;
             if (isNaN(response)) {
                 hasAlreadyParticipated = true
-                console.log(hasAlreadyParticipated)
+                pid = 0
             }
-            pid = response;
-            console.log("code: " + response)
-
             removeStartScreeen()
             startScreenIsActive = false
             setupScene()
@@ -546,6 +642,40 @@ function getOS() {
     return os;
   }
 
+function isMobileDevice() {
+    if(getOS() == 'iOS' || getOS() == 'Android'){
+        return true
+    } else{
+        return false
+    }
+}
+
+  function setConditionsList() {
+    switch (pid%6){
+        case 0:
+            conditionsList = [0,1,5,2,4,3,6]
+            break;
+        case 1:
+            conditionsList = [1,2,0,3,5,4,6]
+            break;
+        case 2:
+            conditionsList = [2,3,1,4,0,5,6]
+            break;
+        case 3:
+            conditionsList = [3,4,2,5,1,0,6]
+            break;
+        case 4:
+            conditionsList = [4,5,3,0,2,1,6]
+            break;
+        case 5:
+            conditionsList = [5,0,4,1,3,2,6]
+            break;
+    }
+
+    
+  }
+
+  
 // PX to cm stuff
 /*
 This monitor:
