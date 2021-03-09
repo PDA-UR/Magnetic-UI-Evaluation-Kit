@@ -37,7 +37,7 @@ let csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,t
     csvContentSize = 0,
     dataHasBeenSentToServer = false;
 //One Chunk equals 10 runs
-let NUMBER_OF_CHUNKS_TO_BE_SENT = 10;
+let NUMBER_OF_CHUNKS_TO_BE_SENT = 1;
 
 
 //setupScene();

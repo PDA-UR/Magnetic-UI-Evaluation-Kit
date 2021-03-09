@@ -1,4 +1,5 @@
-from bottle import route, run, request, template, TEMPLATE_PATH, static_file
+import bottle
+from bottle import route, run, request, template, TEMPLATE_PATH, static_file, response
 import csv
 from csv import reader
 from csv import writer
@@ -6,13 +7,27 @@ import threading
 import nbformat
 import shutil, sys, os
 from nbconvert.preprocessors import ExecutePreprocessor
+
 if __name__ == '__main__':
     log_path = './logs/'
     finished_log_path = './logs/finishedLogs/'
     failed_log_path = './logs/failedLogs/'
     notebook_filename = "MUI_Test_Evaluation.ipynb"
 
+    def enable_cors(fn):
+        def _enable_cors(*args, **kwargs):
+            # set CORS headers
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, OPTIONS'
+            response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token'
+
+            if bottle.request.method != 'OPTIONS':
+                # actual request; reply with the actual response
+                return fn(*args, **kwargs)
+        return _enable_cors
+
     @route("/registerPID/", method='POST')
+    @enable_cors
     def register_PID():
         register_data = request.body.getvalue().decode('utf-8')
         register_values = []
@@ -84,6 +99,7 @@ if __name__ == '__main__':
             writer.writerows(split)
             f.truncate()
             f.close()
+
 
 
     @route("/")
