@@ -96,7 +96,7 @@ if __name__ == '__main__':
             f.truncate()
             f.close()
             
-        h = h = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
+        h = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
             
         with open("finishedHashes.csv", "a") as csvfile:
             csvfile.write("\n" + str(h))
