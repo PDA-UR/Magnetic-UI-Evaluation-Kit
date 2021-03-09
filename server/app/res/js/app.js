@@ -37,7 +37,7 @@ let csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,t
     csvContentSize = 0,
     dataHasBeenSentToServer = false;
 //One Chunk equals 10 runs
-let NUMBER_OF_CHUNKS_TO_BE_SENT = 1;
+let NUMBER_OF_CHUNKS_TO_BE_SENT = 10;
 
 
 //setupScene();
@@ -49,6 +49,7 @@ function setupScene() {
         console.log(condition_id)
         setConfigurationParameters();
         createFrame();
+        createCurrentLevelText();
         createRect();
         createCustomCursor(100, 100);
         timeAtLoadingComplete = Date.now();
@@ -209,6 +210,9 @@ function createFrame() {
     frame.style.background = "black";
     frame.style.position = 'fixed';
     frame.style.display = 'inline';
+    frame.style.top  = 50 + "%"
+    frame.style.left  = 50 + "%"
+    frame.style.transform = "translate(-50%, -50%)"
 }
 
 
@@ -265,6 +269,7 @@ function createStartScreenText() {
             }
         }   else{
             div.remove()
+            setLanguageStrings()
             createStartScreenUi()
         }
     }
@@ -305,20 +310,45 @@ function createStartScreenUi() {
     form.style.alignItems = "center";
     frame.appendChild(form); // put it into the DOM
 
-    createTextInput(form, "Beruf", 0);
-    createTextInput(form, "Geschlecht", 0);
-    createTextInput(form, "Alter", 1);
+    createTextInput(form, "Beruf", 0, formJobString);
+    createDataListInput(form)
+    //createTextInput(form, "Geschlecht", 0);
+    createTextInput(form, "Alter", 1, formAgeString)
 
-    createButton(form, "StartTest");
+    createButton(form, formStartTestButtonString);
 }
+
 function createButton(form, nameOfButton) {
     var btn = document.createElement("BUTTON");
     btn.type = "button"
-    btn.innerHTML = "Start Test";
+    btn.innerHTML = nameOfButton;
     btn.style.id = nameOfButton;
     btn.style.marginTop = 25 + "px";
     btn.onclick = getPID;
     form.appendChild(btn);
+}
+
+
+function createDataListInput(form){
+    var textInputPara = document.createElement("p");
+    textInputPara.style.color = "white";
+    var textInputNode = document.createTextNode(formGenderString);
+    textInputPara.appendChild(textInputNode);
+    form.appendChild(textInputPara);
+
+    var optionList = ["Männlich", "Weiblich", "Divers"];
+    i = 0,
+    len = optionList.length
+
+    var container = document.createElement("select")
+    for (i; i < len; i += 1) {
+        var option = document.createElement('option');
+        option.value = optionList[i];
+        option.text = formGenderChoices[i]
+        container.appendChild(option);
+    }
+    form.appendChild(container)
+    
 }
 
 function getPID() {
@@ -344,13 +374,14 @@ function getCsvDataFromForm() {
             formDataCsvString = formDataCsvString + ",";
         }
     }
+    console.log(formDataCsvString)
     return formDataCsvString;
 }
 
-function createTextInput(form, nameOfInput, isAge) {
+function createTextInput(form, nameOfInput, isAge, titleText) {
     var textInputPara = document.createElement("p");
     textInputPara.style.color = "white";
-    var textInputNode = document.createTextNode(nameOfInput + ":");
+    var textInputNode = document.createTextNode(titleText + ":");
     textInputPara.appendChild(textInputNode);
     form.appendChild(textInputPara);
 
@@ -391,7 +422,27 @@ function createCustomCursor(x, y) {
     frame.appendChild(customCursor);
 }
 
+function createCurrentLevelText(){
+    var h3 = document.createElement("h3")
+    h3.style.textAlign = "center"
+    h3.id = "currentLevelText"
+    var nodeText = "Level: " + (conditionsCompleted + 1).toString() + levelOf + (conditionsList.length - 1).toString()
+    var t = document.createTextNode(nodeText); 
+    t.id = "currentLevelText"
+    h3.style.color = "white"
+    h3.appendChild(t)
+    frame.appendChild(h3)
+}
 
+function updateCurrentLevelText(){
+    var t = document.getElementById("currentLevelText").firstChild
+    if(conditionsCompleted < 6){
+        t.nodeValue = "Level: " + (conditionsCompleted + 1).toString() + levelOf + (conditionsList.length - 1).toString()
+    } else{
+        t.nodeValue = levelsCompleted
+    }
+    
+}
 
 function createRect() {
     targetElement = document.createElement('targetElement');
@@ -420,7 +471,6 @@ function setupNewScene() {
     let newCursorCoords = getNewCursorCoordinates(document.getElementById("rect1"));
     createCustomCursor(newCursorCoords[0], newCursorCoords[1]);
     cursorInside = false;
-    
     timestampConditionStart = Date.now();
     logAllData();
 }
@@ -481,6 +531,7 @@ function logAllData() {
             run_id = 0;
             csvContentSize = 0;
             chunksSentToServer = 0;
+            updateCurrentLevelText()
             setConfigurationParameters();
         }
     } else {
@@ -671,11 +722,37 @@ function isMobileDevice() {
             conditionsList = [5,0,4,1,3,2,6]
             break;
     }
-
-    
   }
 
-  
+function setLanguageStrings(){
+    if(languageIsEN){
+        levelOf = " of "
+        levelsCompleted = "All levels completed"
+        formAgeString = "Age"
+        formGenderString = "Gender"
+        formJobString = "Job"
+        formGenderChoices = ["Male", "Female", "Divers"]
+        formStartTestButtonString = "Start test"
+    } else{
+        levelOf = " von "
+        levelsCompleted = "Alle Level vollendet"
+        formAgeString = "Alter"
+        formGenderString = "Geschlecht"
+        formJobString = "Beruf"
+        formGenderChoices = ["Männlich", "Weiblich", "Divers"]
+        formStartTestButtonString = "Test beginnen"
+    } 
+}
+
+var levelOf,
+levelsCompleted,
+formAgeString,
+formGenderString,
+formJobString,
+formGenderChoices,
+formStartTestButtonString;
+
+
 // PX to cm stuff
 /*
 This monitor:

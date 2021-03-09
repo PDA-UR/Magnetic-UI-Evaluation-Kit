@@ -26,7 +26,7 @@ if __name__ == '__main__':
                 return fn(*args, **kwargs)
         return _enable_cors
 
-    @route("/registerPID/", method='POST')
+    @route("/registerPID/", method=['POST', 'OPTIONS'])
     @enable_cors
     def register_PID():
         register_data = request.body.getvalue().decode('utf-8')
