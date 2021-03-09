@@ -4,6 +4,7 @@ import csv
 from csv import reader
 from csv import writer
 import threading
+import random, string
 import nbformat
 import shutil, sys, os
 from nbconvert.preprocessors import ExecutePreprocessor
@@ -27,12 +28,10 @@ if __name__ == '__main__':
         return _enable_cors
 
     @route("/registerPID/", method=['POST', 'OPTIONS'])
-    @enable_cors
     def register_PID():
         register_data = request.body.getvalue().decode('utf-8')
         register_values = []
         register_values.append(register_data.split(','))
-        print(register_values[0][3])
 
         with open('pidList.csv', newline='') as csvfile:
             reader = csv.DictReader(csvfile)
@@ -40,7 +39,6 @@ if __name__ == '__main__':
 
             for row in reader:
                 maxID += 1
-                print(register_values[0][3])
                 if row['uniqueBrowserID'] == register_values[0][3]:
                     if row['hasFinished'] == str(0):
                         failed_pid = row['ID']
@@ -48,7 +46,6 @@ if __name__ == '__main__':
                             file_path = log_path + failed_pid + '-' + str(x) + ".csv"
                             if os.path.isfile(file_path):
                                 shutil.move(file_path,failed_log_path + failed_pid + '-' + str(x) + ".csv")
-                        print("re play: " + str(maxID))
                         return str(maxID)
                     else:
                         return "f1"
@@ -76,10 +73,9 @@ if __name__ == '__main__':
         log_file.write(log_data)
         log_file.close()
 
-    @route("/logFinish/", method='POST')
+    @route("/logFinish/", method=['POST', 'OPTIONS'])
     def log_finish():
         pid_finished = request.body.getvalue().decode('utf-8')
-        print(pid_finished)
 
         # Move Files to finishedLogs Folder
         for x in range(6):
@@ -88,7 +84,7 @@ if __name__ == '__main__':
                 shutil.move(file_path,finished_log_path + pid_finished+ '-' + str(x) + "-f" + ".csv")
   
         # Update PID list hasFinished
-        f = open('/Users/alexweichart/Documents/GitHub/Magnetic-UI-Evaluation-Kit/server/pidList.csv', "r+")
+        f = open('pidList.csv', "r+")
         line_to_update = int(pid_finished) + 1
         with f:
             r = csv.reader(f) 
@@ -99,8 +95,14 @@ if __name__ == '__main__':
             writer.writerows(split)
             f.truncate()
             f.close()
-
-
+            
+        h = h = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
+            
+        with open("finishedHashes.csv", "a") as csvfile:
+            csvfile.write("\n" + str(h))
+            csvfile.close
+        return str(h)
+        
 
     @route("/")
     def server_static():

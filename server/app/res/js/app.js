@@ -37,7 +37,7 @@ let csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,t
     csvContentSize = 0,
     dataHasBeenSentToServer = false;
 //One Chunk equals 10 runs
-let NUMBER_OF_CHUNKS_TO_BE_SENT = 10;
+let NUMBER_OF_CHUNKS_TO_BE_SENT = 1;
 
 
 //setupScene();
@@ -93,11 +93,6 @@ function setConfigurationParameters() {
 
         case 6:
             postRunsComplete();
-            if(languageIsEN){
-                alert("All runs completed, you can leave this website now!");
-            } else {
-                alert("Alle Durchläufe vollendet, Sie können die Website nun verlassen!");
-            } 
             
             break;
     }
@@ -439,9 +434,76 @@ function updateCurrentLevelText(){
     if(conditionsCompleted < 6){
         t.nodeValue = "Level: " + (conditionsCompleted + 1).toString() + levelOf + (conditionsList.length - 1).toString()
     } else{
-        t.nodeValue = levelsCompleted
+        t.nodeValue = ""
     }
     
+}
+
+function showFinishedHash(hash){
+    removeElement(targetElement.id);
+    removeElement(customCursor.id)
+    document.exitPointerLock();
+    startScreenIsActive = true
+
+    container = document.createElement("div")
+    container.style.background = "white"
+    container.style.width = 80+ "%"
+    container.style.marginLeft = "auto";
+    container.style.marginRight = "auto";
+    container.style.top =  50 + "%";
+    container.style.marginTop = 25 + "%"
+    container.style.display = "block"
+    container.style.textAlign = "center"
+    container.style.padding = 25 + "px"
+    
+
+    var h2 = document.createElement("h2")
+    h2.style.textAlign = "center"
+    h2.id = "finishedHeader"
+    var t = document.createTextNode(finishedHeaderString); 
+    h2.style.color = "black"
+    h2.appendChild(t)
+    container.appendChild(h2)
+
+    var pExplain = document.createElement("p")
+    pExplain.disabled = "true"
+    pExplain.style.textAlign = "center"
+    pExplain.style.width = 60+ "%"
+
+
+    textContainer = document.createElement("div")
+    textContainer.style.marginLeft = "auto"
+    textContainer.style.marginRight = "auto"
+    textContainer.style.background = "Gainsboro"
+    textContainer.style.textAlign = "center"
+    textContainer.style.width = 60 + "%"
+    textContainer.style.padding = 10 + "px"
+    
+    var pExplainText = document.createTextNode(finishedExplainString); 
+    pExplain.style.color = "black"
+    pExplain.style.marginLeft = "auto"
+    pExplain.style.marginRight = "auto"
+    pExplain.appendChild(pExplainText)
+    textContainer.appendChild(pExplain)
+
+    var pHash = document.createElement("h3")
+    pHash.style.textAlign = "center"
+    pHash.style.background = "#ff6961"
+    pHash.style.width = 250 + "px"
+    pHash.style.marginLeft = "auto"
+    pHash.style.marginRight = "auto"
+    var pHashText = document.createTextNode(hash); 
+    pHash.style.color = "black"
+    pHash.appendChild(pHashText)
+    textContainer.appendChild(pHash)
+
+    container.appendChild(textContainer)
+
+    frame.appendChild(container)
+
+
+
+
 }
 
 function createRect() {
@@ -574,7 +636,7 @@ function post(logData) {
             contentType: "text/csv",
             dataType: "txt",
             success: function (data) {
-                alert(data);
+        
             }
         });
     }
@@ -617,14 +679,20 @@ function postRunsComplete() {
             url: "http://localhost:3333/logFinish/",
             type: "POST",
             data: pid,
-            contentType: "text/csv",
-            dataType: "txt",
-            success: function (data) {
-                alert(data);
+            contentType: "text",
+            dataType: "text",
+            success: function (response) {
+                finishedHash = response;
+                showFinishedHash(finishedHash)
             }
         });
+    } else {
+        hash = getRndInteger(1000000000000000, 9999999999999999)
+        showFinishedHash(hash.toString())
     }
 }
+
+
 
 
 //Helper functions
@@ -733,6 +801,8 @@ function setLanguageStrings(){
         formJobString = "Job"
         formGenderChoices = ["Male", "Female", "Divers"]
         formStartTestButtonString = "Start test"
+        finishedHeaderString = "Thank you for participating <3"
+        finishedExplainString = "If you are a student at the University of Regensburg, please send this code to juergen.hahn@ur.de in order to recieve your VP:"
     } else{
         levelOf = " von "
         levelsCompleted = "Alle Level vollendet"
@@ -741,6 +811,8 @@ function setLanguageStrings(){
         formJobString = "Beruf"
         formGenderChoices = ["Männlich", "Weiblich", "Divers"]
         formStartTestButtonString = "Test beginnen"
+        finishedHeaderString = "Vielen Dank für Ihre Teilnahme <3"
+        finishedExplainString = "Wenn Sie ein(e) Student(in) der Universität Regensburg sind, dann schicken Sie bitte folgenden Code an juergen.hahn@ur.de um Ihre Versuchspersonenstunden zu erhalten:"
     } 
 }
 
@@ -750,7 +822,9 @@ formAgeString,
 formGenderString,
 formJobString,
 formGenderChoices,
-formStartTestButtonString;
+formStartTestButtonString,
+finishedHeaderString,
+finishedExplainString;
 
 
 // PX to cm stuff
