@@ -630,7 +630,7 @@ function removeStartScreeen() {
 function post(logData) {
     if (!hasAlreadyParticipated) {
         $.ajax({
-            url: "http://localhost:3333/log/",
+            url: "http://localhost:6666/log/",
             type: "POST",
             data: logData,
             contentType: "text/csv",
@@ -652,7 +652,7 @@ function requestLock() {
 
 function getPidCall(formCsvData) {
     $.ajax({
-        url: "http://localhost:3333/registerPID/",
+        url: "http://localhost:6666/registerPID/",
         type: "POST",
         data: formCsvData,
         contentType: "text",
@@ -676,7 +676,7 @@ function getPidCall(formCsvData) {
 function postRunsComplete() {
     if (!hasAlreadyParticipated) {
         $.ajax({
-            url: "http://localhost:3333/logFinish/",
+            url: "http://localhost:6666/logFinish/",
             type: "POST",
             data: pid,
             contentType: "text",
