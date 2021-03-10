@@ -121,6 +121,5 @@ if __name__ == '__main__':
         return static_file(filename, root='./app/res/jsonConfigFiles')
 
         
-    #threading.Thread(target=
-    run(host="localhost", port=7000, debug=False)#).start()
+    threading.Thread(target=run(host="localhost", port=7000, debug=False)).start()
 
