@@ -7,8 +7,8 @@ let timeAtLastSuccessfulClick,
     UI_SPEED_Y,
     CURSOR_SPEED_X = 1,
     CURSOR_SPEED_Y = 1,
-    rectConfig
-startScreenIsActive = true,
+    rectConfig,
+    startScreenIsActive = true,
     hasAlreadyParticipated = false,
     conditionsCompleted = 0,
     conditionsList = [],
@@ -166,7 +166,6 @@ function moveUI(mouseMovementX, mouseMovementY) {
         yMovement;
 
     //Don't move UI in x or y direction if the cursor is at the left/right or top/bottom edge
-
     if (cursorX >= (parseInt(frame.style.width) - parseInt(customCursor.style.width)) || cursorX <= 0) {
         xMovement = 0,
             yMovement = mouseMovementY;
@@ -511,7 +510,7 @@ function createRect() {
     targetElement.id = "rect1";
     targetElement.name = "rectangleRed";
     targetWidth = 100;
-    targetHeight = 100;
+    targetHeight = 50;
     targetElement.style.width = targetWidth + 'px';
     targetElement.style.height = targetHeight + 'px';
     targetElement.style.background = "red";
@@ -718,9 +717,9 @@ function cursorIsInsideOfElement(elementToCheck) {
     let targetHeightCurrent = parseInt(elementToCheck.style.height),
         targetWidthCurrent = parseInt(elementToCheck.style.width);
 
-    if ((cursorX > newX && cursorY > newY) && (cursorX < newX + targetHeightCurrent && cursorY < newY + targetWidthCurrent)) {
+    if ((cursorX > newX && cursorY > newY) && (cursorX < newX + targetWidthCurrent && cursorY < newY + targetHeightCurrent)) {
+        console.log("inside")
         return true;
-
     } else {
         return false;
     }
