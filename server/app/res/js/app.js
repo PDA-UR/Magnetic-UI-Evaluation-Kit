@@ -46,7 +46,6 @@ setupStartScreen();
 function setupScene() {
         setConditionsList();
         condition_id = conditionsList[conditionsCompleted]
-        console.log(condition_id)
         setConfigurationParameters();
         createFrame();
         createCurrentLevelText();
@@ -368,7 +367,6 @@ function getCsvDataFromForm() {
             formDataCsvString = formDataCsvString + ",";
         }
     }
-    console.log(formDataCsvString)
     return formDataCsvString;
 }
 
@@ -402,7 +400,7 @@ function createCustomCursor(x, y) {
     customCursor = document.createElement('targetElement');
     customCursor.id = "customCursor";
     let customCursorTexture = document.createElement('IMG');
-    customCursorTexture.src = "http://www.rw-designer.com/cursor-extern.php?id=150274";
+    customCursorTexture.src = "/res/customCursorTexture.cur";
     customCursor.appendChild(customCursorTexture)
     customCursor.style.width = 10 + 'px';
     customCursor.style.height = 10 + 'px';
@@ -509,7 +507,7 @@ function createRect() {
     targetElement = document.createElement('targetElement');
     targetElement.id = "rect1";
     targetElement.name = "rectangleRed";
-    targetWidth = 100;
+    targetWidth = 150;
     targetHeight = 50;
     targetElement.style.width = targetWidth + 'px';
     targetElement.style.height = targetHeight + 'px';
@@ -718,7 +716,6 @@ function cursorIsInsideOfElement(elementToCheck) {
         targetWidthCurrent = parseInt(elementToCheck.style.width);
 
     if ((cursorX > newX && cursorY > newY) && (cursorX < newX + targetWidthCurrent && cursorY < newY + targetHeightCurrent)) {
-        console.log("inside")
         return true;
     } else {
         return false;
