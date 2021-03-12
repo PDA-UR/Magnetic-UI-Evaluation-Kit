@@ -798,7 +798,7 @@ function setLanguageStrings(){
         formGenderChoices = ["Female", "Male", "Diverse"]
         formStartTestButtonString = "Start test"
         finishedHeaderString = "Thank you for participating <3"
-        finishedExplainString = "If you are a student at the University of Regensburg, please send this code to juergen.hahn@ur.de in order to recieve your VP:"
+        finishedExplainString = "If you are a student at the University of Regensburg, please send this code to marie.sautmann@stud.uni-regensburg.de in order to recieve your VP:"
     } else{
         levelOf = " von "
         levelsCompleted = "Alle Level vollendet"
@@ -808,7 +808,7 @@ function setLanguageStrings(){
         formGenderChoices = ["Männlich", "Weiblich", "Divers"]
         formStartTestButtonString = "Test beginnen"
         finishedHeaderString = "Vielen Dank für Ihre Teilnahme <3"
-        finishedExplainString = "Wenn Sie ein(e) Student(in) der Universität Regensburg sind, dann schicken Sie bitte folgenden Code an juergen.hahn@ur.de um Ihre Versuchspersonenstunden zu erhalten:"
+        finishedExplainString = "Wenn Sie ein(e) Student(in) der Universität Regensburg sind, dann schicken Sie bitte folgenden Code an marie.sautmann@stud.uni-regensburg.de um Ihre Versuchspersonenstunden zu erhalten:"
     } 
 }
 
