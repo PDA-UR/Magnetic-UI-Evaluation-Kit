@@ -795,7 +795,7 @@ function setLanguageStrings(){
         formAgeString = "Age"
         formGenderString = "Gender"
         formJobString = "Job"
-        formGenderChoices = ["Male", "Female", "Divers"]
+        formGenderChoices = ["Female", "Male", "Diverse"]
         formStartTestButtonString = "Start test"
         finishedHeaderString = "Thank you for participating <3"
         finishedExplainString = "If you are a student at the University of Regensburg, please send this code to juergen.hahn@ur.de in order to recieve your VP:"
