@@ -1,5 +1,9 @@
 /* jshint esversion: 6 */
 
+//One Chunk equals 10 runs
+let NUMBER_OF_CHUNKS_TO_BE_SENT = 10;
+let NUMBER_OF_WARMUP_CHUNKS_TO_BE_SENT = 5;
+
 let timeAtLastSuccessfulClick,
     frame = document.getElementById('frame'),
     timeAtLoadingComplete,
@@ -12,7 +16,8 @@ let timeAtLastSuccessfulClick,
     hasAlreadyParticipated = false,
     conditionsCompleted = 0,
     conditionsList = [],
-    languageIsEN = true;
+    languageIsEN = true,
+    warmupModeIsOn = true;
 
 //Cursor and Target element
 let customCursor,
@@ -35,10 +40,8 @@ let csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,t
     cursorY = null,
     chunksSentToServer = 0,
     csvContentSize = 0,
-    dataHasBeenSentToServer = false;
-//One Chunk equals 10 runs
-let NUMBER_OF_CHUNKS_TO_BE_SENT = 10;
-
+    dataHasBeenSentToServer = false,
+    nrOfChunksToSend;
 
 //setupScene();
 setupStartScreen();
@@ -63,36 +66,58 @@ function setupStartScreen() {
 
 function setConfigurationParameters() {
     switch (condition_id) {
+        case -1:
+            warmupModeIsOn = true;
+            nrOfChunksToSend = NUMBER_OF_WARMUP_CHUNKS_TO_BE_SENT;
+            UI_SPEED_X = 0;
+            UI_SPEED_Y = 0;
+            break;
         case 0:
+            warmupModeIsOn = false;
+            nrOfChunksToSend = NUMBER_OF_CHUNKS_TO_BE_SENT;
             UI_SPEED_X = 0;
             UI_SPEED_Y = 0;
             break;
         case 1:
+            warmupModeIsOn = false;
+            nrOfChunksToSend = NUMBER_OF_CHUNKS_TO_BE_SENT;
             UI_SPEED_X = 0.25;
             UI_SPEED_Y = 0.25;
             break;
         case 2:
+            warmupModeIsOn = false;
+            nrOfChunksToSend = NUMBER_OF_CHUNKS_TO_BE_SENT;
             UI_SPEED_X = 0.5;
             UI_SPEED_Y = 0.5;
             break;
         case 3:
+            warmupModeIsOn = false;
+            nrOfChunksToSend = NUMBER_OF_CHUNKS_TO_BE_SENT;
             UI_SPEED_X = 0.75;
             UI_SPEED_Y = 0.75;
             break;
         case 4:
+            warmupModeIsOn = false;
+            nrOfChunksToSend = NUMBER_OF_CHUNKS_TO_BE_SENT;
             UI_SPEED_X = 1;
             UI_SPEED_Y = 1;
             break;
         case 5:
+            warmupModeIsOn = false;
+            nrOfChunksToSend = NUMBER_OF_CHUNKS_TO_BE_SENT;
             UI_SPEED_X = 0;
             UI_SPEED_Y = 0;
             CURSOR_SPEED_X = 1.5;
             CURSOR_SPEED_Y = 1.5;
             break;
-
         case 6:
+            warmupModeIsOn = true;
+            nrOfChunksToSend = NUMBER_OF_WARMUP_CHUNKS_TO_BE_SENT;
+            UI_SPEED_X = 0;
+            UI_SPEED_Y = 0;
+            break;
+        case 7:
             postRunsComplete();
-            
             break;
     }
 }
@@ -235,8 +260,8 @@ function createStartScreenText() {
     p.style.display = "block"
     p.style.textAlign = "center"
     p.disabled = "true"
-    var introTextEN = "Hello and thank you for participating in our survey!\n\nThis study is a part of an ongoing research project of the BIDT junior research group ‘Physical Digital Affordances’ (https:\/\/hci.ur.de\/). By participating, you will help us to develop new user interfaces which make your work easier.\n\nIn this study, we want to investigate whether and how your click behaviour changes once an user interface moves in the opposite direction of your movements of the mouse cursor. \n\nWe will log your age, gender, and occupation information.\nDuring the study, your mouse movements and clicks, as well as your operating system, are automatically logged and stored by us. The data is collected completely anonymously and stored on a server at the University of Regensburg. It will not be possible to discern whether you participated in this study with the data we intend to log.\n\nIt  takes a maximum of 15 minutes to finish the study. Please make sure that  you are not interrupted during this time.\nPlease try to always click the given target as quickly and accurately as possible!\n\nBefore you start:\n- Make sure you are using a laptop or desktop pc\n- Resize your browser window so that the entire black background area can be seen\n\nIf you have any questions about the study or the research project, you can contact us via the following email addresses:\nmarie.sautmann@stud.uni-regensburg.de, alexander.weichart@stud.uni-regensburg.de and juergen.hahn@ur.de.\n";
-    var introTextDE = "Hallo und vielen Dank für Ihre Teilnahme an unserer Studie!\n\nDiese Studie gliedert sich in ein laufendes Forschungsprojekt der BIDT-Nachwuchsforschungsgruppe ‘Physical Digital Affordances’ (https:\/\/hci.ur.de\/) ein. Ihre Teilnahme hilft uns dabei neue Benutzerschnittstellen zu entwickeln, die Ihnen Ihre Arbeit erleichtern sollen.\n\nMit dieser Studie wollen wir untersuchen, ob und wie sich Ihr Klickverhalten ändert, sobald eine Benutzeroberfläche sich entgegen Ihrer Bewegungen des Mauszeigers bewegt.\n\nIm Folgenden speichern wir Ihre Angaben zu Alter, Geschlecht und Beruf.\nWährend der Studie werden Ihre Mausbewegungen und Klicks, sowie ihr Betriebssystem automatisch gespeichert. Dies geschieht völlig anonym auf einem Server der Universität Regensburg. Ein Rückschluss auf Ihre Person ist zu keinem Zeitpunkt möglich.\n\nDie Teilnahme an der Studie dauert maximal 15 Minuten. Bitte stellen Sie sicher, dass Sie während dieser Zeit die Studie konzentriert und ohne Unterbrechungen durchführen können.\nBitte klicken Sie das vorgegebene Ziel immer so schnell und genau an wie möglich!\n\nBevor Sie die Studie starten:\n- Wechseln Sie zu einem Laptop oder Desktop Pc\n- Passen Sie das Browser Fenster so an, dass die komplette schwarze Hintergrundfläche zu sehen ist\n\nHaben Sie weitere Fragen zur Umfrage oder zum Forschungsprojekt können Sie die Durchführenden der Studie unter folgenden Emailadressen kontaktieren: marie.sautmann@stud.uni-regensburg.de, alexander.weichart@stud.uni-regensburg.de und juergen.hahn@ur.de.\n";
+    var introTextEN = "Hello and thank you for participating in our survey!\n\nThis study is a part of an ongoing research project of the BIDT junior research group ‘Physical Digital Affordances’ (https:\/\/hci.ur.de\/). By participating, you will help us to develop new user interfaces which make your work easier.\n\nIn this study, we want to investigate whether and how your click behaviour changes once an user interface moves in the opposite direction of your movements of the mouse cursor. \n\nWe will log your age, gender, and occupation information.\nDuring the study, your mouse movements and clicks, as well as your operating system, are automatically logged and stored by us. The data is collected completely anonymously and stored on a server at the University of Regensburg. It will not be possible to discern whether you participated in this study with the data we intend to log.\n\nIt  takes a maximum of 15 minutes to finish the study. Please make sure that  you are not interrupted during this time.\nPlease try to always click the given target as quickly and accurately as possible!\n\nIf you have any questions about the study or the research project, you can contact us via the following email addresses:\nmarie.sautmann@stud.uni-regensburg.de, alexander.weichart@stud.uni-regensburg.de and juergen.hahn@ur.de.\n";
+    var introTextDE = "Hallo und vielen Dank für Ihre Teilnahme an unserer Studie!\n\nDiese Studie gliedert sich in ein laufendes Forschungsprojekt der BIDT-Nachwuchsforschungsgruppe ‘Physical Digital Affordances’ (https:\/\/hci.ur.de\/) ein. Ihre Teilnahme hilft uns dabei neue Benutzerschnittstellen zu entwickeln, die Ihnen Ihre Arbeit erleichtern sollen.\n\nMit dieser Studie wollen wir untersuchen, ob und wie sich Ihr Klickverhalten ändert, sobald eine Benutzeroberfläche sich entgegen Ihrer Bewegungen des Mauszeigers bewegt.\n\nIm Folgenden speichern wir Ihre Angaben zu Alter, Geschlecht und Beruf.\nWährend der Studie werden Ihre Mausbewegungen und Klicks, sowie ihr Betriebssystem automatisch gespeichert. Dies geschieht völlig anonym auf einem Server der Universität Regensburg. Ein Rückschluss auf Ihre Person ist zu keinem Zeitpunkt möglich.\n\nDie Teilnahme an der Studie dauert maximal 15 Minuten. Bitte stellen Sie sicher, dass Sie während dieser Zeit die Studie konzentriert und ohne Unterbrechungen durchführen können.\nBitte klicken Sie das vorgegebene Ziel immer so schnell und genau an wie möglich!\n\nHaben Sie weitere Fragen zur Umfrage oder zum Forschungsprojekt können Sie die Durchführenden der Studie unter folgenden Emailadressen kontaktieren: marie.sautmann@stud.uni-regensburg.de, alexander.weichart@stud.uni-regensburg.de und juergen.hahn@ur.de.\n";
     var t2 = document.createTextNode(introTextEN); 
     p.appendChild(t2)
     div.appendChild(p)
@@ -250,21 +275,35 @@ function createStartScreenText() {
     startButton.style.background = "#00cc66"
     startButton.style.margin = 15 + "px"
     startButton.style.padding = 10 + "px"
-    startButton.textContent = "Start now!"
+    startButton.textContent = "Ready!"
+    var startButtonHasBeenClicked = false;
     startButton.onclick = function(){
-        var w = window.innerWidth;
-        var h = window.innerHeight;
-        if (w < parseInt(frame.style.width) || h < parseInt(frame.style.height)){
-            if(languageIsEN){
-                alert("Please resize the browser window so that the entire black area can be seen!")
-            }   else {
-                alert("Bitte passen Sie das Browser Fenster so an, dass die komplette schwarze Fläche zu sehen ist!")
+        if(startButtonHasBeenClicked){
+            var w = window.innerWidth;
+            var h = window.innerHeight;
+            if (w < parseInt(frame.style.width) || h < parseInt(frame.style.height)){
+                if(languageIsEN){
+                    alert("Please resize the browser window so that the entire black area can be seen!")
+                }   else {
+                    alert("Bitte passen Sie das Browser Fenster so an, dass die komplette schwarze Fläche zu sehen ist!")
+                }
+            }   else{
+                div.remove()
+                setLanguageStrings()
+                createStartScreenUi()
             }
-        }   else{
-            div.remove()
+        } else {
+            startButtonHasBeenClicked = true
             setLanguageStrings()
-            createStartScreenUi()
+            t2.nodeValue = introTextSetupRules
+            if(languageIsEN){
+                startButton.textContent = "Start now!" 
+            } else {
+                startButton.textContent = "Jetzt Beginnen!" 
+            }
+             
         }
+        
     }
 
     var switchLanguageButton = document.createElement("button");
@@ -272,17 +311,34 @@ function createStartScreenText() {
     switchLanguageButton.style.padding = 10 + "px"
     switchLanguageButton.textContent = "Change language to German"
     switchLanguageButton.onclick = function(){
-        if (languageIsEN){
+        if (languageIsEN && !startButtonHasBeenClicked){
+            languageIsEN = false
+            setLanguageStrings()
             t2.nodeValue = introTextDE
             switchLanguageButton.textContent = "Sprache zu Englisch wechseln"
-            startButton.textContent = "Jetzt beginnen!"
-            languageIsEN = false
-        }   else {
+            startButton.textContent = "Bereit!"  
+        }   else if (!languageIsEN && !startButtonHasBeenClicked){
+            languageIsEN = true
+            setLanguageStrings()
             t2.nodeValue = introTextEN
             switchLanguageButton.textContent = "Change language to German"
-            startButton.textContent = "Start now!"
+            startButton.textContent = "Ready!"
             languageIsEN = true
+        }   else if (!languageIsEN && startButtonHasBeenClicked){
+            languageIsEN = true
+            setLanguageStrings()
+            t2.nodeValue = introTextSetupRules
+            switchLanguageButton.textContent = "Change language to German"
+            startButton.textContent = "Start now!"
+        }   else if (languageIsEN && startButtonHasBeenClicked){
+            languageIsEN = false
+            setLanguageStrings()
+            t2.nodeValue = introTextSetupRules
+            switchLanguageButton.textContent = "Sprache zu Englisch wechseln"
+            startButton.textContent = "Jetzt beginnen!"
         }
+
+
     }
 
     buttonContainer.appendChild(switchLanguageButton)
@@ -428,7 +484,7 @@ function createCurrentLevelText(){
 
 function updateCurrentLevelText(){
     var t = document.getElementById("currentLevelText").firstChild
-    if(conditionsCompleted < 6){
+    if(conditionsCompleted < 8){
         t.nodeValue = "Level: " + (conditionsCompleted + 1).toString() + levelOf + (conditionsList.length - 1).toString()
     } else{
         t.nodeValue = ""
@@ -577,13 +633,13 @@ function logAllData() {
     //Number of log entries to be recorded
     if ((run_id % 10 == 0) && run_id != 0) {
 
-        if (chunksSentToServer < NUMBER_OF_CHUNKS_TO_BE_SENT && !dataHasBeenSentToServer) {
+        if (chunksSentToServer < nrOfChunksToSend && !dataHasBeenSentToServer) {
             post(csvContent);
             chunksSentToServer = chunksSentToServer + 1;
             csvContent = "";
             csvContentSize = 1;
             dataHasBeenSentToServer = true;
-        } else if (chunksSentToServer == NUMBER_OF_CHUNKS_TO_BE_SENT) {
+        } else if (chunksSentToServer == nrOfChunksToSend) {
             csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,timestampCollision,timestampClick,mouseIsInsideElement,targetX,targetY,targetWidth,targetHeight,cursorX,cursorY";
             conditionsCompleted = conditionsCompleted + 1;
             condition_id = conditionsList[conditionsCompleted]
@@ -768,22 +824,22 @@ function isMobileDevice() {
   function setConditionsList() {
     switch (pid%6){
         case 0:
-            conditionsList = [0,1,5,2,4,3,6]
+            conditionsList = [-1,0,1,5,2,4,3,6,7]
             break;
         case 1:
-            conditionsList = [1,2,0,3,5,4,6]
+            conditionsList = [-1,1,2,0,3,5,4,6,7]
             break;
         case 2:
-            conditionsList = [2,3,1,4,0,5,6]
+            conditionsList = [-1,2,3,1,4,0,5,6,7]
             break;
         case 3:
-            conditionsList = [3,4,2,5,1,0,6]
+            conditionsList = [-1,3,4,2,5,1,0,6,7]
             break;
         case 4:
-            conditionsList = [4,5,3,0,2,1,6]
+            conditionsList = [-1,4,5,3,0,2,1,6,7]
             break;
         case 5:
-            conditionsList = [5,0,4,1,3,2,6]
+            conditionsList = [-1,5,0,4,1,3,2,6,7]
             break;
     }
   }
@@ -799,6 +855,7 @@ function setLanguageStrings(){
         formStartTestButtonString = "Start test"
         finishedHeaderString = "Thank you for participating <3"
         finishedExplainString = "If you are a student at the University of Regensburg, please send this code to marie.sautmann@stud.uni-regensburg.de in order to recieve your VP:"
+        introTextSetupRules = "\nBefore you start:\n- Make sure you are using a laptop or desktop pc\n- Resize your browser window so that the entire black background area can be seen\n- Make sure your browser zoom is at exactly 100%, don't zoom in or out"
     } else{
         levelOf = " von "
         levelsCompleted = "Alle Level vollendet"
@@ -809,6 +866,7 @@ function setLanguageStrings(){
         formStartTestButtonString = "Test beginnen"
         finishedHeaderString = "Vielen Dank für Ihre Teilnahme <3"
         finishedExplainString = "Wenn Sie ein(e) Student(in) der Universität Regensburg sind, dann schicken Sie bitte folgenden Code an marie.sautmann@stud.uni-regensburg.de um Ihre Versuchspersonenstunden zu erhalten:"
+        introTextSetupRules = "\nBevor Sie die Studie starten:\n- Wechseln Sie zu einem Laptop oder Desktop Pc\n- Passen Sie das Browser Fenster so an, dass die komplette schwarze Hintergrundfläche zu sehen ist\n- Setzen Sie ihren Browser Zoom auf genau 100%, zoomen Sie nicht hinein oder heraus"
     } 
 }
 
@@ -820,7 +878,8 @@ formJobString,
 formGenderChoices,
 formStartTestButtonString,
 finishedHeaderString,
-finishedExplainString;
+finishedExplainString,
+introTextSetupRules;
 
 
 // PX to cm stuff

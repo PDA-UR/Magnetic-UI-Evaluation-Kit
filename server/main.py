@@ -42,10 +42,16 @@ if __name__ == '__main__':
                 if row['uniqueBrowserID'] == register_values[0][3]:
                     if row['hasFinished'] == str(0):
                         failed_pid = row['ID']
-                        for x in range(6):
-                            file_path = log_path + failed_pid + '-' + str(x) + ".csv"
+                        for x in range(9):
+                            conditionName = str(x)
+                            if x == 7:
+                                conditionName = "warmup"
+                            elif x == 8:
+                                conditionName = "cooldown"
+                            
+                            file_path = log_path + failed_pid + '-' + conditionName + ".csv"
                             if os.path.isfile(file_path):
-                                shutil.move(file_path,failed_log_path + failed_pid + '-' + str(x) + ".csv")
+                                shutil.move(file_path,failed_log_path + failed_pid + '-' + conditionName + ".csv")
                         return str(maxID)
                     else:
                         return "f1"
@@ -68,7 +74,11 @@ if __name__ == '__main__':
         condition_id = rows[1][2]
         run_id = rows[1][3]
 
-        # Write csv data to file
+        if condition_id == "-1":
+            condition_id = "warmup"
+        elif condition_id == "6":
+            condition_id = "cooldown"
+        
         log_file = open(log_path + pid + "-" + condition_id + ".csv", "a")
         log_file.write(log_data)
         log_file.close()
@@ -78,10 +88,19 @@ if __name__ == '__main__':
         pid_finished = request.body.getvalue().decode('utf-8')
 
         # Move Files to finishedLogs Folder
-        for x in range(6):
-            file_path = log_path + pid_finished + '-' + str(x) + ".csv"
+        for x in range(9):
+
+            conditionName = str(x)
+
+            if x == 7:
+                conditionName = "warmup"
+            elif x == 8:
+                conditionName = "cooldown"
+                
+            file_path = log_path + pid_finished + '-' + conditionName + ".csv"
+
             if os.path.isfile(file_path):
-                shutil.move(file_path,finished_log_path + pid_finished+ '-' + str(x) + "-f" + ".csv")
+                shutil.move(file_path,finished_log_path + pid_finished+ '-' + conditionName + "-f" + ".csv")
   
         # Update PID list hasFinished
         f = open('pidList.csv', "r+")
