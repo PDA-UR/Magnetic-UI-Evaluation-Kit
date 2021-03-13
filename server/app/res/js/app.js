@@ -54,7 +54,7 @@ function setupScene() {
         createCurrentLevelText();
         createRect();
         createCustomCursor(100, 100);
-        timeAtLoadingComplete = $.now();
+        timeAtLoadingComplete = performance.now();
     
 }
 
@@ -169,7 +169,7 @@ frame.addEventListener('click', event => {
             element.webkitRequestPointerLock;
         frame.requestPointerLock();
 
-        timestampClick = $.now();
+        timestampClick = performance.now();
         if (cursorIsInsideOfElement(targetElement)) {
             //clicked element
             cursorInside = true;
@@ -221,7 +221,7 @@ function moveUI(mouseMovementX, mouseMovementY) {
         if (!cursorInside) {
             //Cursor entered element just now
             cursorInside = true;
-            timestampCollision = $.now();
+            timestampCollision = performance.now();
         }
     } else {
         //Cursor is outside of element
@@ -598,7 +598,7 @@ function setupNewScene() {
     let newCursorCoords = getNewCursorCoordinates(document.getElementById("rect1"));
     createCustomCursor(newCursorCoords[0], newCursorCoords[1]);
     cursorInside = false;
-    timestampConditionStart = $.now();
+    timestampConditionStart = performance.now();
     logAllData();
 }
 
@@ -638,7 +638,7 @@ function rotateAroundCenter(centerX, centerY, objectToRotateX, objectToRotateY) 
 
 //Logging
 function logAllData() {
-    let timestampLogEntry = $.now(),
+    let timestampLogEntry = performance.now(),
         targetWidth = targetElement.style.width,
         targetHeight = targetElement.style.height;
 
