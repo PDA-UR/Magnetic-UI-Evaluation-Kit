@@ -645,7 +645,7 @@ function logAllData() {
         targetHeight = targetElement.style.height;
 
     //Number of log entries to be recorded
-    if ((run_id % 10 == 0) && run_id != 0) {
+    if ((run_id % 5 == 0) && run_id != 0) {
 
         if (chunksSentToServer < nrOfChunksToSend && !dataHasBeenSentToServer) {
             post(csvContent);
