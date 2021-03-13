@@ -168,8 +168,12 @@ frame.addEventListener('click', event => {
             element.mozRequestPointerLock ||
             element.webkitRequestPointerLock;
         frame.requestPointerLock();
-
+        if(timestampClick != null){
+            console.log("timestampClick before update: " + timestampClick.toString())
+        }
+        
         timestampClick = performance.now();
+        console.log("timestampClick after update: " + timestampClick.toString())
         if (cursorIsInsideOfElement(targetElement)) {
             //clicked element
             cursorInside = true;
@@ -181,6 +185,7 @@ frame.addEventListener('click', event => {
             cursorInside = false;
             logAllData();
         }
+        console.log("timestampClick after log: " + timestampClick.toString())
     }
 });
 
