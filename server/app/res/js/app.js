@@ -169,17 +169,15 @@ frame.addEventListener('click', event => {
             element.webkitRequestPointerLock;
         frame.requestPointerLock();
 
-
+        timestampClick = Date.now();
         if (cursorIsInsideOfElement(targetElement)) {
             //clicked element
             cursorInside = true;
-            timestampClick = Date.now();
             logAllData();
             //setup new scene
             setupNewScene();
         } else {
             //clicked canvas
-            timestampClick = Date.now();
             cursorInside = false;
             logAllData();
         }
