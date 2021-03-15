@@ -1,8 +1,8 @@
 /* jshint esversion: 6 */
 
 //One Chunk equals 10 runs
-let NUMBER_OF_CHUNKS_TO_BE_SENT = 10;
-let NUMBER_OF_WARMUP_CHUNKS_TO_BE_SENT = 5;
+let NUMBER_OF_CHUNKS_TO_BE_SENT = 20;
+let NUMBER_OF_WARMUP_CHUNKS_TO_BE_SENT = 10;
 
 let timeAtLastSuccessfulClick,
     frame = document.getElementById('frame'),
@@ -23,7 +23,7 @@ let timeAtLastSuccessfulClick,
 let customCursor,
     targetElement;
 
-//Loged Data    
+//Logged Data    
 let csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,timestampCollision,timestampClick,mouseIsInsideElement,targetX,targetY,targetWidth,targetHeight,cursorX,cursorY",
     pid = 111,
     condition_id = 0,
@@ -38,10 +38,13 @@ let csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,t
     targetHeight,
     cursorX = null,
     cursorY = null,
-    chunksSentToServer = 0,
     csvContentSize = 0,
     dataHasBeenSentToServer = false,
     nrOfChunksToSend;
+
+//Locking
+let csvQueueCheckpoint = 0;
+    csvQueue = [];
 
 //setupScene();
 setupStartScreen();
@@ -55,6 +58,7 @@ function setupScene() {
         createRect();
         createCustomCursor(100, 100);
         timeAtLoadingComplete = performance.now();
+        logAllData(timeAtLoadingComplete), false;
     
 }
 
@@ -148,44 +152,35 @@ frame.addEventListener('mousemove', event => {
         } else {
             if (event.movementX != 0 || event.movementY != 0) {
                 moveCursor(event.movementX, event.movementY);
-
                 moveUI(event.movementX, event.movementY);
-                logAllData();
+
+                timestamp = performance.now();
+                logAllData(timestamp, false);
 
             }
 
         }
     }
-
-
-
 });
 
 frame.addEventListener('click', event => {
     if (!startScreenIsActive) {
         //request Pointer Lock
-        frame.requestPointerLock = frame.requestPointerLock ||
-            element.mozRequestPointerLock ||
-            element.webkitRequestPointerLock;
-        frame.requestPointerLock();
-        if(timestampClick != null){
-            console.log("timestampClick before update: " + timestampClick.toString());
-        }
         
-        timestampClick = performance.now();
-        console.log("timestampClick after update: " + timestampClick.toString());
+    
+        timestamp = performance.now();
+        timestampClick = timestamp;
         if (cursorIsInsideOfElement(targetElement)) {
             //clicked element
             cursorInside = true;
-            logAllData();
-            //setup new scene
+            logAllData(timestamp, true);
+            sendCsvContentToServer();
             setupNewScene();
         } else {
             //clicked canvas
             cursorInside = false;
-            logAllData();
+            logAllData(timestamp, true);
         }
-        console.log("timestampClick after log: " + timestampClick.toString());
     }
 });
 
@@ -570,10 +565,6 @@ function showFinishedHash(hash){
     container.appendChild(textContainer);
 
     frame.appendChild(container);
-
-
-
-
 }
 
 function createRect() {
@@ -597,14 +588,25 @@ function createRect() {
 
 function setupNewScene() {
     run_id = run_id + 1;
+
+    if (run_id % (nrOfChunksToSend * 5 + 1) == 0 && run_id != 0){
+        csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,timestampCollision,timestampClick,mouseIsInsideElement,targetX,targetY,targetWidth,targetHeight,cursorX,cursorY";
+        conditionsCompleted++;
+        condition_id = conditionsList[conditionsCompleted];
+        run_id = 0;
+        updateCurrentLevelText()
+        setConfigurationParameters();
+    }
+
     removeElement(targetElement.id);
     removeElement(customCursor.id);
     createRect();
     let newCursorCoords = getNewCursorCoordinates(document.getElementById("rect1"));
     createCustomCursor(newCursorCoords[0], newCursorCoords[1]);
     cursorInside = false;
+
     timestampConditionStart = performance.now();
-    logAllData();
+    logAllData(timestampConditionStart,false)
 }
 
 function removeElement(elementId) {
@@ -641,36 +643,20 @@ function rotateAroundCenter(centerX, centerY, objectToRotateX, objectToRotateY) 
 }
 
 //Logging
-function logAllData() {
-    let timestampLogEntry = performance.now(),
-        targetWidth = targetElement.style.width,
-        targetHeight = targetElement.style.height;
+function logAllData(timestamp, isClick) {
+    let clickTS = "";
 
-    //Number of log entries to be recorded
-    if ((run_id % 5 == 0) && run_id != 0) {
-
-        if (chunksSentToServer < nrOfChunksToSend && !dataHasBeenSentToServer) {
-            post(csvContent);
-            chunksSentToServer = chunksSentToServer + 1;
-            csvContent = "";
-            csvContentSize = 1;
-            dataHasBeenSentToServer = true;
-        } else if (chunksSentToServer == nrOfChunksToSend) {
-            csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,timestampCollision,timestampClick,mouseIsInsideElement,targetX,targetY,targetWidth,targetHeight,cursorX,cursorY";
-            conditionsCompleted = conditionsCompleted + 1;
-            condition_id = conditionsList[conditionsCompleted];
-            run_id = 0;
-            csvContentSize = 0;
-            chunksSentToServer = 0;
-            updateCurrentLevelText()
-            setConfigurationParameters();
-        }
-    } else {
-        dataHasBeenSentToServer = false;
+    if(isClick){
+    clickTS = timestamp;
+    } else{
+        clickTS = "oldval";
     }
+    
 
-    //Do not log first run, since pointer lock has to be requested first and the run starts immediately after the page loads 
-    //TODO: Implement start screen
+    let timestampLogEntry = timestamp,
+    targetWidth = targetElement.style.width,
+    targetHeight = targetElement.style.height;
+
     if (run_id > 0) {
         let logString = timestampLogEntry + "," +
             pid + "," +
@@ -678,7 +664,7 @@ function logAllData() {
             run_id + "," +
             timestampConditionStart + "," +
             timestampCollision + "," +
-            timestampClick + "," +
+            clickTS + "," +
             cursorInside + "," +
             newX + "," +
             newY + "," +
@@ -686,29 +672,47 @@ function logAllData() {
             targetHeight + "," +
             cursorX + "," +
             cursorY;
-
-        csvContent = csvContent + "\n" + logString;
+        csvQueue.push(logString);
     }
-    csvContentSize = csvContentSize + 1;
+}
+
+async function sendCsvContentToServer(){
+    //Number of log entries to be recorded
+    if ((run_id % 5 == 0) && run_id != 0) {  
+        fillCsvContentWithQueue();
+        post(csvContent);
+        csvContent = "";
+    }
+}
+
+function fillCsvContentWithQueue(){
+    i = 0;
+    for (csvQueueCheckpoint; csvQueueCheckpoint < csvQueue.length; csvQueueCheckpoint++){
+        csvContent = csvContent + "\n" + csvQueue[csvQueueCheckpoint];
+        i++;
+    }
 }
 
 function removeStartScreeen() {
     $('#inputForm').remove();
 }
 
-function post(logData) {
+async function post(logData) {
     if (!hasAlreadyParticipated) {
         $.ajax({
             url: "http://localhost:7000/log/",
             type: "POST",
             data: logData,
-            contentType: "text/csv",
-            dataType: "txt",
+            async: true,
+            contentType: "text",
+            dataType: "text",
             success: function (response) {
             }
         });
+    } else{
     }
 }
+
 
 function requestLock() {
     frame.requestPointerLock = frame.requestPointerLock ||
