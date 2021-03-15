@@ -23,7 +23,7 @@ let timeAtLastSuccessfulClick,
 let customCursor,
     targetElement;
 
-//Loged Data    
+//Logged Data    
 let csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,timestampCollision,timestampClick,mouseIsInsideElement,targetX,targetY,targetWidth,targetHeight,cursorX,cursorY",
     pid = 111,
     condition_id = 0,
@@ -166,13 +166,11 @@ frame.addEventListener('mousemove', event => {
 frame.addEventListener('click', event => {
     if (!startScreenIsActive) {
         //request Pointer Lock
-        frame.requestPointerLock = frame.requestPointerLock ||
-            element.mozRequestPointerLock ||
-            element.webkitRequestPointerLock;
-        frame.requestPointerLock();
+        
     
         timestamp = performance.now();
         timestampClick = timestamp;
+        console.log("updated click variable: " + timestampClick)
         if (cursorIsInsideOfElement(targetElement)) {
             //clicked element
             cursorInside = true;
@@ -668,9 +666,7 @@ function logAllData(timestamp) {
             targetHeight + "," +
             cursorX + "," +
             cursorY;
-
         csvQueue.push(logString);
-        console.log("appended")
     }
 }
 
@@ -679,7 +675,6 @@ async function sendCsvContentToServer(){
     if ((run_id % 5 == 0) && run_id != 0) {  
         console.log("sending to server");
         fillCsvContentWithQueue();
-        console.log(csvContent);
         post(csvContent);
         csvContent = "";
     }
@@ -689,6 +684,7 @@ function fillCsvContentWithQueue(){
     i = 0;
     for (csvQueueCheckpoint; csvQueueCheckpoint < csvQueue.length; csvQueueCheckpoint++){
         csvContent = csvContent + "\n" + csvQueue[csvQueueCheckpoint];
+        console.log(csvQueue[csvQueueCheckpoint]);
         i++;
     }
     console.log("read " + i.toString() + "from queue, queue length " + csvQueue.length.toString());
