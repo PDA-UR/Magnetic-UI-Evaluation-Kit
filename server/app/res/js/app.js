@@ -679,6 +679,7 @@ async function sendCsvContentToServer(){
     if ((run_id % 5 == 0) && run_id != 0) {  
         console.log("sending to server");
         fillCsvContentWithQueue();
+        console.log(csvContent);
         post(csvContent);
         csvContent = "";
     }
