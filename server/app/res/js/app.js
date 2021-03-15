@@ -48,7 +48,7 @@ setupStartScreen();
 
 function setupScene() {
         setConditionsList();
-        condition_id = conditionsList[conditionsCompleted]
+        condition_id = conditionsList[conditionsCompleted];
         setConfigurationParameters();
         createFrame();
         createCurrentLevelText();
@@ -169,11 +169,11 @@ frame.addEventListener('click', event => {
             element.webkitRequestPointerLock;
         frame.requestPointerLock();
         if(timestampClick != null){
-            console.log("timestampClick before update: " + timestampClick.toString())
+            console.log("timestampClick before update: " + timestampClick.toString());
         }
         
         timestampClick = performance.now();
-        console.log("timestampClick after update: " + timestampClick.toString())
+        console.log("timestampClick after update: " + timestampClick.toString());
         if (cursorIsInsideOfElement(targetElement)) {
             //clicked element
             cursorInside = true;
@@ -185,20 +185,20 @@ frame.addEventListener('click', event => {
             cursorInside = false;
             logAllData();
         }
-        console.log("timestampClick after log: " + timestampClick.toString())
+        console.log("timestampClick after log: " + timestampClick.toString());
     }
 });
 
 
 //General movement logic
 function moveCursor(mouseMovementX, mouseMovementY) {
-    customCursorTop = parseInt(customCursor.style.top),
-        customCursorLeft = parseInt(customCursor.style.left),
+    customCursorTop = parseInt(customCursor.style.top);
+        customCursorLeft = parseInt(customCursor.style.left);
 
-        cursorX = limitNumberWithinRange((customCursorLeft + mouseMovementX * CURSOR_SPEED_X), 0, 1000 - 10),
+        cursorX = limitNumberWithinRange((customCursorLeft + mouseMovementX * CURSOR_SPEED_X), 0, 1000 - 10);
         cursorY = limitNumberWithinRange((customCursorTop + mouseMovementY * CURSOR_SPEED_X), 0, 750 - 10);
 
-    customCursor.style.left = cursorX + 'px',
+    customCursor.style.left = cursorX + 'px';
         customCursor.style.top = cursorY + 'px';
 }
 
@@ -208,13 +208,13 @@ function moveUI(mouseMovementX, mouseMovementY) {
 
     //Don't move UI in x or y direction if the cursor is at the left/right or top/bottom edge
     if (cursorX >= (parseInt(frame.style.width) - parseInt(customCursor.style.width)) || cursorX <= 0) {
-        xMovement = 0,
+        xMovement = 0;
             yMovement = mouseMovementY;
     } else if (cursorY >= (parseInt(frame.style.height) - parseInt(customCursor.style.height)) || cursorY <= 0) {
         xMovement = mouseMovementX,
             yMovement = 0;
     } else {
-        xMovement = mouseMovementX,
+        xMovement = mouseMovementX;
             yMovement = mouseMovementY;
     }
 
@@ -245,54 +245,54 @@ function createFrame() {
     frame.style.background = "black";
     frame.style.position = 'fixed';
     frame.style.display = 'inline';
-    frame.style.top  = 50 + "%"
-    frame.style.left  = 50 + "%"
-    frame.style.transform = "translate(-50%, -50%)"
+    frame.style.top  = 50 + "%";
+    frame.style.left  = 50 + "%";
+    frame.style.transform = "translate(-50%, -50%)";
 }
 
 
 function createStartScreenText() {
     var div = document.createElement("div");
-    div.id = "startTextContainer"
-    div.style.background = "white"
+    div.id = "startTextContainer";
+    div.style.background = "white";
     div.style.marginLeft = "auto";
     div.style.marginRight = "auto";
     div.style.marginTop = 50 + 'px';
     div.style.alignItems = "center";
-    div.style.height = 80 + "%"
-    div.style.width = 90 + "%"
-    div.style.paddingTop = 10 + "px"
+    div.style.height = 80 + "%";
+    div.style.width = 90 + "%";
+    div.style.paddingTop = 10 + "px";
 
-    var h3 = document.createElement("h3")
-    h3.style.textAlign = "center"
+    var h3 = document.createElement("h3");
+    h3.style.textAlign = "center";
     var t = document.createTextNode("Magnetic UI"); 
-    h3.appendChild(t)
-    div.appendChild(h3)
+    h3.appendChild(t);
+    div.appendChild(h3);
 
-    var p = document.createElement("textarea")
-    p.style.width = 80+ "%"
-    p.style.height = 450 + "px"
+    var p = document.createElement("textarea");
+    p.style.width = 80+ "%";
+    p.style.height = 450 + "px";
     p.style.marginLeft = "auto";
     p.style.marginRight = "auto";
-    p.style.display = "block"
-    p.style.textAlign = "center"
-    p.disabled = "true"
+    p.style.display = "block";
+    p.style.textAlign = "center";
+    p.disabled = "true";
     var introTextEN = "Hello and thank you for participating in our survey!\n\nThis study is a part of an ongoing research project of the BIDT junior research group ‘Physical Digital Affordances’ (https:\/\/hci.ur.de\/). By participating, you will help us to develop new user interfaces which make your work easier.\n\nIn this study, we want to investigate whether and how your click behaviour changes once an user interface moves in the opposite direction of your movements of the mouse cursor. \n\nWe will log your age, gender, and occupation information.\nDuring the study, your mouse movements and clicks, as well as your operating system, are automatically logged and stored by us. The data is collected completely anonymously and stored on a server at the University of Regensburg. It will not be possible to discern whether you participated in this study with the data we intend to log.\n\nIt  takes a maximum of 15 minutes to finish the study. Please make sure that  you are not interrupted during this time.\nPlease try to always click the given target as quickly and accurately as possible!\n\nIf you have any questions about the study or the research project, you can contact us via the following email addresses:\nmarie.sautmann@stud.uni-regensburg.de, alexander.weichart@stud.uni-regensburg.de and juergen.hahn@ur.de.\n";
     var introTextDE = "Hallo und vielen Dank für Ihre Teilnahme an unserer Studie!\n\nDiese Studie gliedert sich in ein laufendes Forschungsprojekt der BIDT-Nachwuchsforschungsgruppe ‘Physical Digital Affordances’ (https:\/\/hci.ur.de\/) ein. Ihre Teilnahme hilft uns dabei neue Benutzerschnittstellen zu entwickeln, die Ihnen Ihre Arbeit erleichtern sollen.\n\nMit dieser Studie wollen wir untersuchen, ob und wie sich Ihr Klickverhalten ändert, sobald eine Benutzeroberfläche sich entgegen Ihrer Bewegungen des Mauszeigers bewegt.\n\nIm Folgenden speichern wir Ihre Angaben zu Alter, Geschlecht und Beruf.\nWährend der Studie werden Ihre Mausbewegungen und Klicks, sowie ihr Betriebssystem automatisch gespeichert. Dies geschieht völlig anonym auf einem Server der Universität Regensburg. Ein Rückschluss auf Ihre Person ist zu keinem Zeitpunkt möglich.\n\nDie Teilnahme an der Studie dauert maximal 15 Minuten. Bitte stellen Sie sicher, dass Sie während dieser Zeit die Studie konzentriert und ohne Unterbrechungen durchführen können.\nBitte klicken Sie das vorgegebene Ziel immer so schnell und genau an wie möglich!\n\nHaben Sie weitere Fragen zur Umfrage oder zum Forschungsprojekt können Sie die Durchführenden der Studie unter folgenden Emailadressen kontaktieren: marie.sautmann@stud.uni-regensburg.de, alexander.weichart@stud.uni-regensburg.de und juergen.hahn@ur.de.\n";
     var t2 = document.createTextNode(introTextEN); 
-    p.appendChild(t2)
-    div.appendChild(p)
+    p.appendChild(t2);
+    div.appendChild(p);
 
     var buttonContainer = document.createElement("div");
-    buttonContainer.style.left = 50 + "%"
+    buttonContainer.style.left = 50 + "%";
     buttonContainer.style.top = 50 + "%"
-    buttonContainer.style.textAlign = "center"
+    buttonContainer.style.textAlign = "center";
 
     var startButton = document.createElement("button");
-    startButton.style.background = "#00cc66"
-    startButton.style.margin = 15 + "px"
-    startButton.style.padding = 10 + "px"
-    startButton.textContent = "Ready!"
+    startButton.style.background = "#00cc66";
+    startButton.style.margin = 15 + "px";
+    startButton.style.padding = 10 + "px";
+    startButton.textContent = "Ready!";
     var startButtonHasBeenClicked = false;
     startButton.onclick = function(){
         if(startButtonHasBeenClicked){
@@ -300,23 +300,23 @@ function createStartScreenText() {
             var h = window.innerHeight;
             if (w < parseInt(frame.style.width) || h < parseInt(frame.style.height)){
                 if(languageIsEN){
-                    alert("Please resize the browser window so that the entire black area can be seen!")
+                    alert("Please resize the browser window so that the entire black area can be seen!");
                 }   else {
-                    alert("Bitte passen Sie das Browser Fenster so an, dass die komplette schwarze Fläche zu sehen ist!")
+                    alert("Bitte passen Sie das Browser Fenster so an, dass die komplette schwarze Fläche zu sehen ist!");
                 }
             }   else{
-                div.remove()
-                setLanguageStrings()
-                createStartScreenUi()
+                div.remove();
+                setLanguageStrings();
+                createStartScreenUi();
             }
         } else {
-            startButtonHasBeenClicked = true
-            setLanguageStrings()
-            t2.nodeValue = introTextSetupRules
+            startButtonHasBeenClicked = true;
+            setLanguageStrings();
+            t2.nodeValue = introTextSetupRules;
             if(languageIsEN){
-                startButton.textContent = "Start now!" 
+                startButton.textContent = "Start now!";
             } else {
-                startButton.textContent = "Jetzt Beginnen!" 
+                startButton.textContent = "Jetzt Beginnen!";
             }
              
         }
@@ -324,44 +324,44 @@ function createStartScreenText() {
     }
 
     var switchLanguageButton = document.createElement("button");
-    switchLanguageButton.style.margin = 15 + "px"
-    switchLanguageButton.style.padding = 10 + "px"
-    switchLanguageButton.textContent = "Change language to German"
+    switchLanguageButton.style.margin = 15 + "px";
+    switchLanguageButton.style.padding = 10 + "px";
+    switchLanguageButton.textContent = "Change language to German";
     switchLanguageButton.onclick = function(){
         if (languageIsEN && !startButtonHasBeenClicked){
-            languageIsEN = false
-            setLanguageStrings()
-            t2.nodeValue = introTextDE
-            switchLanguageButton.textContent = "Sprache zu Englisch wechseln"
-            startButton.textContent = "Bereit!"  
+            languageIsEN = false;
+            setLanguageStrings();
+            t2.nodeValue = introTextDE;
+            switchLanguageButton.textContent = "Sprache zu Englisch wechseln";
+            startButton.textContent = "Bereit!";
         }   else if (!languageIsEN && !startButtonHasBeenClicked){
-            languageIsEN = true
-            setLanguageStrings()
-            t2.nodeValue = introTextEN
-            switchLanguageButton.textContent = "Change language to German"
-            startButton.textContent = "Ready!"
-            languageIsEN = true
+            languageIsEN = true;
+            setLanguageStrings();
+            t2.nodeValue = introTextEN;
+            switchLanguageButton.textContent = "Change language to German";
+            startButton.textContent = "Ready!";
+            languageIsEN = true;
         }   else if (!languageIsEN && startButtonHasBeenClicked){
-            languageIsEN = true
-            setLanguageStrings()
-            t2.nodeValue = introTextSetupRules
-            switchLanguageButton.textContent = "Change language to German"
-            startButton.textContent = "Start now!"
+            languageIsEN = true;
+            setLanguageStrings();
+            t2.nodeValue = introTextSetupRules;
+            switchLanguageButton.textContent = "Change language to German";
+            startButton.textContent = "Start now!";
         }   else if (languageIsEN && startButtonHasBeenClicked){
-            languageIsEN = false
-            setLanguageStrings()
-            t2.nodeValue = introTextSetupRules
-            switchLanguageButton.textContent = "Sprache zu Englisch wechseln"
-            startButton.textContent = "Jetzt beginnen!"
+            languageIsEN = false;
+            setLanguageStrings();
+            t2.nodeValue = introTextSetupRules;
+            switchLanguageButton.textContent = "Sprache zu Englisch wechseln";
+            startButton.textContent = "Jetzt beginnen!";
         }
 
 
     }
 
-    buttonContainer.appendChild(switchLanguageButton)
-    buttonContainer.appendChild(startButton)
-    div.appendChild(buttonContainer)
-    frame.appendChild(div)
+    buttonContainer.appendChild(switchLanguageButton);
+    buttonContainer.appendChild(startButton);
+    div.appendChild(buttonContainer);
+    frame.appendChild(div);
 }
 
 function createStartScreenUi() {
@@ -377,16 +377,16 @@ function createStartScreenUi() {
     frame.appendChild(form); // put it into the DOM
 
     createTextInput(form, "Beruf", 0, formJobString);
-    createDataListInput(form)
+    createDataListInput(form);
     //createTextInput(form, "Geschlecht", 0);
-    createTextInput(form, "Alter", 1, formAgeString)
+    createTextInput(form, "Alter", 1, formAgeString);
 
     createButton(form, formStartTestButtonString);
 }
 
 function createButton(form, nameOfButton) {
     var btn = document.createElement("BUTTON");
-    btn.type = "button"
+    btn.type = "button";
     btn.innerHTML = nameOfButton;
     btn.style.id = nameOfButton;
     btn.style.marginTop = 25 + "px";
@@ -406,26 +406,26 @@ function createDataListInput(form){
     i = 0,
     len = optionList.length
 
-    var container = document.createElement("select")
+    var container = document.createElement("select");
     for (i; i < len; i += 1) {
         var option = document.createElement('option');
         option.value = optionList[i];
-        option.text = formGenderChoices[i]
+        option.text = formGenderChoices[i];
         container.appendChild(option);
     }
-    form.appendChild(container)
+    form.appendChild(container);
     
 }
 
 function getPID() {
     if (!isMobileDevice()){
         let formCsvDataWithUniqueID = getCsvDataFromForm() + "," + getUniqueBrowserID() + "," + getOS();
-        getPidCall(formCsvDataWithUniqueID)
+        getPidCall(formCsvDataWithUniqueID);
     } else{
         if(languageIsEN){
-            alert("Smartphones and tablets are not supported, please use a laptop or desktop pc.")
+            alert("Smartphones and tablets are not supported, please use a laptop or desktop pc.");
         } else{
-            alert("Smartphones und Tablets werden nicht unterstützt, bitte nutzen Sie einen Laptop oder Desktop Pc.")
+            alert("Smartphones und Tablets werden nicht unterstützt, bitte nutzen Sie einen Laptop oder Desktop Pc.");
         }
     }
 }
@@ -457,13 +457,13 @@ function createTextInput(form, nameOfInput, isAge, titleText) {
 
     if (isAge) {
         textInput.addEventListener('input', restrictNumber);
-        textInput.maxLength = "3"
+        textInput.maxLength = "3";
         function restrictNumber(e) {
             var newValue = this.value.replace(new RegExp(/[^\d]/, 'ig'), "");
             this.value = newValue;
         }
     } else {
-        textInput.maxLength = "24"
+        textInput.maxLength = "24";
     }
     textInput.style.id = nameOfInput;
     form.appendChild(textInput); // put it into the DOM
@@ -474,12 +474,12 @@ function createCustomCursor(x, y) {
     customCursor.id = "customCursor";
     let customCursorTexture = document.createElement('IMG');
     customCursorTexture.src = "/res/customCursorTexture.cur";
-    customCursor.appendChild(customCursorTexture)
+    customCursor.appendChild(customCursorTexture);
     customCursor.style.width = 10 + 'px';
     customCursor.style.height = 10 + 'px';
     customCursor.style.position = 'absolute';
     customCursor.display = 'inline';
-    customCursor.background = 'white'
+    customCursor.background = 'white';
     cursorX = x;
     cursorY = y;
     customCursor.style.left = x + "px";
@@ -488,88 +488,88 @@ function createCustomCursor(x, y) {
 }
 
 function createCurrentLevelText(){
-    var h3 = document.createElement("h3")
-    h3.style.textAlign = "center"
-    h3.id = "currentLevelText"
-    var nodeText = "Level: " + (conditionsCompleted + 1).toString() + levelOf + (conditionsList.length - 1).toString()
+    var h3 = document.createElement("h3");
+    h3.style.textAlign = "center";
+    h3.id = "currentLevelText";
+    var nodeText = "Level: " + (conditionsCompleted + 1).toString() + levelOf + (conditionsList.length - 1).toString();
     var t = document.createTextNode(nodeText); 
-    t.id = "currentLevelText"
-    h3.style.color = "white"
-    h3.appendChild(t)
-    frame.appendChild(h3)
+    t.id = "currentLevelText";
+    h3.style.color = "white";
+    h3.appendChild(t);
+    frame.appendChild(h3);
 }
 
 function updateCurrentLevelText(){
-    var t = document.getElementById("currentLevelText").firstChild
+    var t = document.getElementById("currentLevelText").firstChild;
     if(conditionsCompleted < 8){
-        t.nodeValue = "Level: " + (conditionsCompleted + 1).toString() + levelOf + (conditionsList.length - 1).toString()
+        t.nodeValue = "Level: " + (conditionsCompleted + 1).toString() + levelOf + (conditionsList.length - 1).toString();
     } else{
-        t.nodeValue = ""
+        t.nodeValue = "";
     }
     
 }
 
 function showFinishedHash(hash){
     removeElement(targetElement.id);
-    removeElement(customCursor.id)
+    removeElement(customCursor.id);
     document.exitPointerLock();
-    startScreenIsActive = true
+    startScreenIsActive = true;
 
-    container = document.createElement("div")
-    container.style.background = "white"
-    container.style.width = 80+ "%"
+    container = document.createElement("div");
+    container.style.background = "white";
+    container.style.width = 80+ "%";
     container.style.marginLeft = "auto";
     container.style.marginRight = "auto";
     container.style.top =  50 + "%";
-    container.style.marginTop = 25 + "%"
-    container.style.display = "block"
-    container.style.textAlign = "center"
-    container.style.padding = 25 + "px"
+    container.style.marginTop = 25 + "%";
+    container.style.display = "block";
+    container.style.textAlign = "center";
+    container.style.padding = 25 + "px";
     
 
-    var h2 = document.createElement("h2")
-    h2.style.textAlign = "center"
-    h2.id = "finishedHeader"
+    var h2 = document.createElement("h2");
+    h2.style.textAlign = "center";
+    h2.id = "finishedHeader";
     var t = document.createTextNode(finishedHeaderString); 
-    h2.style.color = "black"
-    h2.appendChild(t)
-    container.appendChild(h2)
+    h2.style.color = "black";
+    h2.appendChild(t);
+    container.appendChild(h2);
 
-    var pExplain = document.createElement("p")
-    pExplain.disabled = "true"
-    pExplain.style.textAlign = "center"
-    pExplain.style.width = 60+ "%"
+    var pExplain = document.createElement("p");
+    pExplain.disabled = "true";
+    pExplain.style.textAlign = "center";
+    pExplain.style.width = 60+ "%";
 
 
-    textContainer = document.createElement("div")
-    textContainer.style.marginLeft = "auto"
-    textContainer.style.marginRight = "auto"
-    textContainer.style.background = "Gainsboro"
-    textContainer.style.textAlign = "center"
-    textContainer.style.width = 60 + "%"
-    textContainer.style.padding = 10 + "px"
+    textContainer = document.createElement("div");
+    textContainer.style.marginLeft = "auto";
+    textContainer.style.marginRight = "auto";
+    textContainer.style.background = "Gainsboro";
+    textContainer.style.textAlign = "center";
+    textContainer.style.width = 60 + "%";
+    textContainer.style.padding = 10 + "px";
     
     var pExplainText = document.createTextNode(finishedExplainString); 
-    pExplain.style.color = "black"
-    pExplain.style.marginLeft = "auto"
-    pExplain.style.marginRight = "auto"
-    pExplain.appendChild(pExplainText)
-    textContainer.appendChild(pExplain)
+    pExplain.style.color = "black";
+    pExplain.style.marginLeft = "auto";
+    pExplain.style.marginRight = "auto";
+    pExplain.appendChild(pExplainText);
+    textContainer.appendChild(pExplain);
 
-    var pHash = document.createElement("h3")
-    pHash.style.textAlign = "center"
-    pHash.style.background = "#ff6961"
-    pHash.style.width = 250 + "px"
-    pHash.style.marginLeft = "auto"
-    pHash.style.marginRight = "auto"
+    var pHash = document.createElement("h3");
+    pHash.style.textAlign = "center";
+    pHash.style.background = "#ff6961";
+    pHash.style.width = 250 + "px";
+    pHash.style.marginLeft = "auto";
+    pHash.style.marginRight = "auto";
     var pHashText = document.createTextNode(hash); 
-    pHash.style.color = "black"
-    pHash.appendChild(pHashText)
-    textContainer.appendChild(pHash)
+    pHash.style.color = "black";
+    pHash.appendChild(pHashText);
+    textContainer.appendChild(pHash);
 
-    container.appendChild(textContainer)
+    container.appendChild(textContainer);
 
-    frame.appendChild(container)
+    frame.appendChild(container);
 
 
 
@@ -598,7 +598,7 @@ function createRect() {
 function setupNewScene() {
     run_id = run_id + 1;
     removeElement(targetElement.id);
-    removeElement(customCursor.id)
+    removeElement(customCursor.id);
     createRect();
     let newCursorCoords = getNewCursorCoordinates(document.getElementById("rect1"));
     createCustomCursor(newCursorCoords[0], newCursorCoords[1]);
@@ -617,7 +617,6 @@ function removeElement(elementId) {
 function getNewCursorCoordinates(elementToSpawnAround) {
     let centerX = parseInt(elementToSpawnAround.style.left) - parseInt(customCursor.style.width) / 2 + parseInt(elementToSpawnAround.style.width) / 2,
         centerY = parseInt(elementToSpawnAround.style.top) - parseInt(customCursor.style.height) / 2 + parseInt(elementToSpawnAround.style.height) / 2,
-
         cursorStartX = centerX + 300,
         cursorStartY = centerY,
         coords = rotateAroundCenter(centerX, centerY, cursorStartX, cursorStartY);
@@ -659,7 +658,7 @@ function logAllData() {
         } else if (chunksSentToServer == nrOfChunksToSend) {
             csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,timestampCollision,timestampClick,mouseIsInsideElement,targetX,targetY,targetWidth,targetHeight,cursorX,cursorY";
             conditionsCompleted = conditionsCompleted + 1;
-            condition_id = conditionsList[conditionsCompleted]
+            condition_id = conditionsList[conditionsCompleted];
             run_id = 0;
             csvContentSize = 0;
             chunksSentToServer = 0;
@@ -705,8 +704,7 @@ function post(logData) {
             data: logData,
             contentType: "text/csv",
             dataType: "txt",
-            success: function (data) {
-        
+            success: function (response) {
             }
         });
     }
@@ -731,12 +729,12 @@ function getPidCall(formCsvData) {
         success: function (response) {
             pid = response;
             if (isNaN(response)) {
-                hasAlreadyParticipated = true
-                pid = 0
+                hasAlreadyParticipated = true;
+                pid = 0;
             }
-            removeStartScreeen()
-            startScreenIsActive = false
-            setupScene()
+            removeStartScreeen();
+            startScreenIsActive = false;
+            setupScene();
             requestLock();
         }
     });
@@ -753,12 +751,12 @@ function postRunsComplete() {
             dataType: "text",
             success: function (response) {
                 finishedHash = response;
-                showFinishedHash(finishedHash)
+                showFinishedHash(finishedHash);
             }
         });
     } else {
-        hash = getRndInteger(1000000000000000, 9999999999999999)
-        showFinishedHash(hash.toString())
+        hash = getRndInteger(1000000000000000, 9999999999999999);
+        showFinishedHash(hash.toString());
     }
 }
 
@@ -778,8 +776,8 @@ function degreesToRadians(degrees) {
 function limitNumberWithinRange(num, min, max) {
     const MIN = min || 1;
     const MAX = max || 20;
-    const parsed = parseInt(num)
-    return Math.min(Math.max(parsed, MIN), MAX)
+    const parsed = parseInt(num);
+    return Math.min(Math.max(parsed, MIN), MAX);
 }
 
 function cursorIsInsideOfElement(elementToCheck) {
@@ -796,13 +794,13 @@ function cursorIsInsideOfElement(elementToCheck) {
 }
 
 function getUniqueBrowserID() {
-    let magneticUiLocalStorageKey = "uniqueMuiBrowserID"
+    let magneticUiLocalStorageKey = "uniqueMuiBrowserID";
     if (localStorage.getItem(magneticUiLocalStorageKey) === null) {
         let newUniqueID = Math.random().toString(36).substr(2, 9);
         localStorage.setItem(magneticUiLocalStorageKey, newUniqueID);
-        return newUniqueID
+        return newUniqueID;
     } else {
-        return localStorage.getItem(magneticUiLocalStorageKey)
+        return localStorage.getItem(magneticUiLocalStorageKey);
     }
 }
 
@@ -832,58 +830,58 @@ function getOS() {
 
 function isMobileDevice() {
     if(getOS() == 'iOS' || getOS() == 'Android'){
-        return true
+        return true;
     } else{
-        return false
+        return false;
     }
 }
 
   function setConditionsList() {
     switch (pid%6){
         case 0:
-            conditionsList = [-1,0,1,5,2,4,3,6,7]
+            conditionsList = [-1,0,1,5,2,4,3,6,7];
             break;
         case 1:
-            conditionsList = [-1,1,2,0,3,5,4,6,7]
+            conditionsList = [-1,1,2,0,3,5,4,6,7];
             break;
         case 2:
-            conditionsList = [-1,2,3,1,4,0,5,6,7]
+            conditionsList = [-1,2,3,1,4,0,5,6,7];
             break;
         case 3:
-            conditionsList = [-1,3,4,2,5,1,0,6,7]
+            conditionsList = [-1,3,4,2,5,1,0,6,7];
             break;
         case 4:
-            conditionsList = [-1,4,5,3,0,2,1,6,7]
+            conditionsList = [-1,4,5,3,0,2,1,6,7];
             break;
         case 5:
-            conditionsList = [-1,5,0,4,1,3,2,6,7]
+            conditionsList = [-1,5,0,4,1,3,2,6,7];
             break;
     }
   }
 
 function setLanguageStrings(){
     if(languageIsEN){
-        levelOf = " of "
-        levelsCompleted = "All levels completed"
-        formAgeString = "Age"
-        formGenderString = "Gender"
-        formJobString = "Job"
-        formGenderChoices = ["Female", "Male", "Diverse"]
-        formStartTestButtonString = "Start test"
-        finishedHeaderString = "Thank you for participating <3"
-        finishedExplainString = "If you are a student at the University of Regensburg, please send this code to marie.sautmann@stud.uni-regensburg.de in order to recieve your VP:"
-        introTextSetupRules = "\nBefore you start:\n- Make sure you are using a laptop or desktop pc\n- Resize your browser window so that the entire black background area can be seen\n- Make sure your browser zoom is at exactly 100%, don't zoom in or out"
+        levelOf = " of ";
+        levelsCompleted = "All levels completed";
+        formAgeString = "Age";
+        formGenderString = "Gender";
+        formJobString = "Job";
+        formGenderChoices = ["Female", "Male", "Diverse"];
+        formStartTestButtonString = "Start test";
+        finishedHeaderString = "Thank you for participating <3";
+        finishedExplainString = "If you are a student at the University of Regensburg, please send this code to marie.sautmann@stud.uni-regensburg.de in order to recieve your VP:";
+        introTextSetupRules = "\nBefore you start:\n- Make sure you are using a laptop or desktop pc\n- Resize your browser window so that the entire black background area can be seen\n- Make sure your browser zoom is at exactly 100%, don't zoom in or out";
     } else{
-        levelOf = " von "
-        levelsCompleted = "Alle Level vollendet"
-        formAgeString = "Alter"
-        formGenderString = "Geschlecht"
-        formJobString = "Beruf"
-        formGenderChoices = ["Männlich", "Weiblich", "Divers"]
-        formStartTestButtonString = "Test beginnen"
-        finishedHeaderString = "Vielen Dank für Ihre Teilnahme <3"
-        finishedExplainString = "Wenn Sie ein(e) Student(in) der Universität Regensburg sind, dann schicken Sie bitte folgenden Code an marie.sautmann@stud.uni-regensburg.de um Ihre Versuchspersonenstunden zu erhalten:"
-        introTextSetupRules = "\nBevor Sie die Studie starten:\n- Wechseln Sie zu einem Laptop oder Desktop Pc\n- Passen Sie das Browser Fenster so an, dass die komplette schwarze Hintergrundfläche zu sehen ist\n- Setzen Sie ihren Browser Zoom auf genau 100%, zoomen Sie nicht hinein oder heraus"
+        levelOf = " von ";
+        levelsCompleted = "Alle Level vollendet";
+        formAgeString = "Alter";
+        formGenderString = "Geschlecht";
+        formJobString = "Beruf";
+        formGenderChoices = ["Männlich", "Weiblich", "Divers"];
+        formStartTestButtonString = "Test beginnen";
+        finishedHeaderString = "Vielen Dank für Ihre Teilnahme <3";
+        finishedExplainString = "Wenn Sie ein(e) Student(in) der Universität Regensburg sind, dann schicken Sie bitte folgenden Code an marie.sautmann@stud.uni-regensburg.de um Ihre Versuchspersonenstunden zu erhalten:";
+        introTextSetupRules = "\nBevor Sie die Studie starten:\n- Wechseln Sie zu einem Laptop oder Desktop Pc\n- Passen Sie das Browser Fenster so an, dass die komplette schwarze Hintergrundfläche zu sehen ist\n- Setzen Sie ihren Browser Zoom auf genau 100%, zoomen Sie nicht hinein oder heraus";
     } 
 }
 
