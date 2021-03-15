@@ -166,7 +166,7 @@ frame.addEventListener('mousemove', event => {
 frame.addEventListener('click', event => {
     if (!startScreenIsActive) {
         //request Pointer Lock
-        
+        requestLock();
     
         timestamp = performance.now();
         timestampClick = timestamp;
