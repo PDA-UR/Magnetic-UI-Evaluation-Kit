@@ -54,14 +54,17 @@ if __name__ == '__main__':
                             file_path = log_path + failed_pid + '-' + conditionName + ".csv"
                             if os.path.isfile(file_path):
                                 shutil.move(file_path,failed_log_path + failed_pid + '-' + conditionName + ".csv")
+                        csvfile.close()
                         return str(maxID)
                     else:
+                        csvfile.close()
                         return "f1"
-            with open("pidList.csv", "a") as csvfile:
-                id = maxID + 1
-                writer = csv.writer(csvfile, delimiter=',')
-                writer.writerow([register_values[0][0],register_values[0][1],register_values[0][2],id,0,register_values[0][3],register_values[0][4]])
-                return str(id)
+        with open("pidList.csv", "a") as csvfile:
+            id = maxID + 1
+            writer = csv.writer(csvfile, delimiter=',')
+            writer.writerow([register_values[0][0],register_values[0][1],register_values[0][2],id,0,register_values[0][3],register_values[0][4]])
+            csvfile.close()
+            return str(id)
         
 
     @route("/log/", method="POST")
@@ -78,6 +81,13 @@ if __name__ == '__main__':
         pid = rows[1][1]
         condition_id = rows[1][2]
         run_id = rows[1][3]
+
+        # Logging
+        timestamp = ""
+        for row in rows:
+            if timestamp != row[6]:
+                print("Logged different click timestamps: " + row[6])
+                timestamp = row[6]
 
         if condition_id == "-1":
             condition_id = "warmup"
