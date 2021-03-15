@@ -58,7 +58,7 @@ function setupScene() {
         createRect();
         createCustomCursor(100, 100);
         timeAtLoadingComplete = performance.now();
-        logAllData(timeAtLoadingComplete);
+        logAllData(timeAtLoadingComplete), false;
     
 }
 
@@ -155,7 +155,7 @@ frame.addEventListener('mousemove', event => {
                 moveUI(event.movementX, event.movementY);
 
                 timestamp = performance.now();
-                logAllData(timestamp);
+                logAllData(timestamp, false);
 
             }
 
@@ -174,13 +174,13 @@ frame.addEventListener('click', event => {
         if (cursorIsInsideOfElement(targetElement)) {
             //clicked element
             cursorInside = true;
-            logAllData(timestamp);
+            logAllData(timestamp, true);
             sendCsvContentToServer();
             setupNewScene();
         } else {
             //clicked canvas
             cursorInside = false;
-            logAllData(timestamp);
+            logAllData(timestamp, true);
         }
     }
 });
@@ -608,7 +608,7 @@ function setupNewScene() {
     cursorInside = false;
 
     timestampConditionStart = performance.now();
-    logAllData(timestampConditionStart)
+    logAllData(timestampConditionStart,false)
 }
 
 function removeElement(elementId) {
@@ -645,7 +645,15 @@ function rotateAroundCenter(centerX, centerY, objectToRotateX, objectToRotateY) 
 }
 
 //Logging
-function logAllData(timestamp) {
+function logAllData(timestamp, isClick) {
+    let clickTS = "";
+
+    if(isClick){
+    clickTS = timestamp;
+    } else{
+        clickTS = "oldval";
+    }
+    
 
     let timestampLogEntry = timestamp,
     targetWidth = targetElement.style.width,
@@ -658,7 +666,7 @@ function logAllData(timestamp) {
             run_id + "," +
             timestampConditionStart + "," +
             timestampCollision + "," +
-            timestampClick + "," +
+            clickTS + "," +
             cursorInside + "," +
             newX + "," +
             newY + "," +
