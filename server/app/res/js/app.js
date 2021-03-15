@@ -646,31 +646,6 @@ function logAllData() {
         targetWidth = targetElement.style.width,
         targetHeight = targetElement.style.height;
 
-    //Number of log entries to be recorded
-    if ((run_id % 5 == 0) && run_id != 0) {
-
-        if (chunksSentToServer < nrOfChunksToSend && !dataHasBeenSentToServer) {
-            post(csvContent);
-            chunksSentToServer = chunksSentToServer + 1;
-            csvContent = "";
-            csvContentSize = 1;
-            dataHasBeenSentToServer = true;
-        } else if (chunksSentToServer == nrOfChunksToSend) {
-            csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,timestampCollision,timestampClick,mouseIsInsideElement,targetX,targetY,targetWidth,targetHeight,cursorX,cursorY";
-            conditionsCompleted = conditionsCompleted + 1;
-            condition_id = conditionsList[conditionsCompleted];
-            run_id = 0;
-            csvContentSize = 0;
-            chunksSentToServer = 0;
-            updateCurrentLevelText()
-            setConfigurationParameters();
-        }
-    } else {
-        dataHasBeenSentToServer = false;
-    }
-
-    //Do not log first run, since pointer lock has to be requested first and the run starts immediately after the page loads 
-    //TODO: Implement start screen
     if (run_id > 0) {
         let logString = timestampLogEntry + "," +
             pid + "," +
@@ -690,6 +665,28 @@ function logAllData() {
         csvContent = csvContent + "\n" + logString;
     }
     csvContentSize = csvContentSize + 1;
+
+    //Number of log entries to be recorded
+    if ((run_id % 5 == 0) && run_id != 0) {
+        if (chunksSentToServer < nrOfChunksToSend && !dataHasBeenSentToServer) {
+            post(csvContent);
+            chunksSentToServer = chunksSentToServer + 1;
+            csvContent = "";
+            csvContentSize = 1;
+            dataHasBeenSentToServer = true;
+        } else if (chunksSentToServer == nrOfChunksToSend) {
+            csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,timestampCollision,timestampClick,mouseIsInsideElement,targetX,targetY,targetWidth,targetHeight,cursorX,cursorY";
+            conditionsCompleted = conditionsCompleted + 1;
+            condition_id = conditionsList[conditionsCompleted];
+            run_id = 0;
+            csvContentSize = 0;
+            chunksSentToServer = 0;
+            updateCurrentLevelText()
+            setConfigurationParameters();
+        }
+    } else {
+        dataHasBeenSentToServer = false;
+    }
 }
 
 function removeStartScreeen() {
