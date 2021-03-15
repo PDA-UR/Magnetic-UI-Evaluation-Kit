@@ -170,7 +170,6 @@ frame.addEventListener('click', event => {
     
         timestamp = performance.now();
         timestampClick = timestamp;
-        console.log("updated click variable: " + timestampClick)
         if (cursorIsInsideOfElement(targetElement)) {
             //clicked element
             cursorInside = true;
@@ -591,7 +590,6 @@ function setupNewScene() {
     run_id = run_id + 1;
 
     if (run_id % (nrOfChunksToSend * 5 + 1) == 0 && run_id != 0){
-        console.log("new condtition")
         csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,timestampCollision,timestampClick,mouseIsInsideElement,targetX,targetY,targetWidth,targetHeight,cursorX,cursorY";
         conditionsCompleted++;
         condition_id = conditionsList[conditionsCompleted];
@@ -681,7 +679,6 @@ function logAllData(timestamp, isClick) {
 async function sendCsvContentToServer(){
     //Number of log entries to be recorded
     if ((run_id % 5 == 0) && run_id != 0) {  
-        console.log("sending to server");
         fillCsvContentWithQueue();
         post(csvContent);
         csvContent = "";
@@ -692,10 +689,8 @@ function fillCsvContentWithQueue(){
     i = 0;
     for (csvQueueCheckpoint; csvQueueCheckpoint < csvQueue.length; csvQueueCheckpoint++){
         csvContent = csvContent + "\n" + csvQueue[csvQueueCheckpoint];
-        console.log(csvQueue[csvQueueCheckpoint]);
         i++;
     }
-    console.log("read " + i.toString() + "from queue, queue length " + csvQueue.length.toString());
 }
 
 function removeStartScreeen() {
@@ -712,7 +707,6 @@ async function post(logData) {
             contentType: "text",
             dataType: "text",
             success: function (response) {
-                console.log("send sucessful")
             }
         });
     } else{
