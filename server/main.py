@@ -85,9 +85,10 @@ if __name__ == '__main__':
         # Logging
         timestamp = ""
         for row in rows:
-            if timestamp != row[6]:
-                print("Logged different click timestamps: " + row[6])
-                timestamp = row[6]
+            if len(row) > 1:
+                if timestamp != row[6]:
+                    print("Logged different click timestamps: " + row[6])
+                    timestamp = row[6]
 
         if condition_id == "-1":
             condition_id = "warmup"
