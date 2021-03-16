@@ -681,7 +681,6 @@ async function sendCsvContentToServer(){
     if ((run_id % 5 == 0) && run_id != 0) {  
         fillCsvContentWithQueue();
         post(csvContent);
-        csvContent = "";
     }
 }
 
@@ -706,7 +705,13 @@ async function post(logData) {
             async: true,
             contentType: "text",
             dataType: "text",
+            async: true,
             success: function (response) {
+                if(response == 200){
+                    csvContent = "";
+                }  
+            },
+            error: function (response) {
             }
         });
     } else{

@@ -70,6 +70,9 @@ if __name__ == '__main__':
     @route("/log/", method="POST")
     def log():
         asyncio.run(saveLog(request))
+        if len(request.body.getvalue().decode('utf-8')) > 500:
+            return "200"
+        
 
     async def saveLog(request):
         log_data = request.body.getvalue().decode('utf-8')
