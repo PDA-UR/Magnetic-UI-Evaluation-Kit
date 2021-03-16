@@ -82,14 +82,6 @@ if __name__ == '__main__':
         condition_id = rows[1][2]
         run_id = rows[1][3]
 
-        # Logging
-        timestamp = ""
-        for row in rows:
-            if len(row) > 1:
-                if timestamp != row[6]:
-                    print("Logged different click timestamps: " + row[6])
-                    timestamp = row[6]
-
         if condition_id == "-1":
             condition_id = "warmup"
         elif condition_id == "6":
