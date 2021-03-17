@@ -45,6 +45,9 @@ let csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,t
 //Locking
 let csvQueueCheckpoint = 0;
     csvQueue = [];
+//Variables to check double firing of mouse move event
+let lastMouseMovementX,
+    lastMouseMovementY;
 
 //setupScene();
 setupStartScreen();
@@ -140,7 +143,6 @@ function setConfigurationParameters() {
     }
 }
 
-
 //Listeners
 frame.addEventListener('mousemove', event => {
     //Initiate cursor at start
@@ -151,11 +153,18 @@ frame.addEventListener('mousemove', event => {
             cursorY = event.clientY;
         } else {
             if (event.movementX != 0 || event.movementY != 0) {
+                //double firing, ignore second
+                if (!(lastMouseMovementX == event.movementX && lastMouseMovementY == event.movementY)) {
+
+                lastMouseMovementX = event.movementX,
+                lastMouseMovementY = event.movementY;
+
                 moveCursor(event.movementX, event.movementY);
                 moveUI(event.movementX, event.movementY);
 
                 timestamp = performance.now();
                 logAllData(timestamp, false);
+                }
 
             }
 
