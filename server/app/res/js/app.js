@@ -713,7 +713,7 @@ async function post(logData, currentCondition) {
             dataType: "text",
             async: true,
             success: function (response) {
-                if(response == 200 && currentPID == condition_id){
+                if(response == 200 && currentCondition == condition_id){
                     csvContent = "";
                 }
             },
