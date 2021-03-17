@@ -21,7 +21,9 @@ let timeAtLastSuccessfulClick,
 
 //Cursor and Target element
 let customCursor,
-    targetElement;
+    targetElement,
+    circleRadius = 50,
+    circleCanvasSize = [100, 100];
 
 //Logged Data    
 let csvContent = "timestampLog,pid,condition_id,run_id,timestampConditionStart,timestampCollision,timestampClick,mouseIsInsideElement,targetX,targetY,targetWidth,targetHeight,cursorX,cursorY",
@@ -58,10 +60,12 @@ function setupScene() {
         setConfigurationParameters();
         createFrame();
         createCurrentLevelText();
-        createRect();
-        createCustomCursor(100, 100);
+        
+        createCustomCursor(500, 500);
+        var coords = getNewTargetCoordinates(customCursor);
+        createTargetCircle(coords[0], coords[1]);
         timeAtLoadingComplete = performance.now();
-        logAllData(timeAtLoadingComplete), false;
+        logAllData(timeAtLoadingComplete, false);
     
 }
 
@@ -146,7 +150,6 @@ function setConfigurationParameters() {
 //Listeners
 frame.addEventListener('mousemove', event => {
     //Initiate cursor at start
-
     if (!startScreenIsActive) {
         if (cursorX == null || cursorY == null) {
             cursorX = event.clientX;
@@ -179,14 +182,14 @@ frame.addEventListener('click', event => {
     
         timestamp = performance.now();
         timestampClick = timestamp;
-        if (cursorIsInsideOfElement(targetElement)) {
+        if (cursorIsInsideOfElement()) {
             //clicked element
             cursorInside = true;
             logAllData(timestamp, true);
             sendCsvContentToServer();
             setupNewScene();
         } else {
-            //clicked canvas
+            //clicked targetElement
             cursorInside = false;
             logAllData(timestamp, true);
         }
@@ -225,7 +228,9 @@ function moveUI(mouseMovementX, mouseMovementY) {
     let targetElementTop = parseInt(targetElement.style.top),
         targetElementLeft = parseInt(targetElement.style.left);
 
-    if (cursorIsInsideOfElement(targetElement)) {
+    
+
+    if (cursorIsInsideOfElement()) {
         //Cursor is inside element
         if (!cursorInside) {
             //Cursor entered element just now
@@ -482,6 +487,7 @@ function createCustomCursor(x, y) {
     customCursor.style.width = 10 + 'px';
     customCursor.style.height = 10 + 'px';
     customCursor.style.position = 'absolute';
+    customCursor.style.zIndex = "100"
     customCursor.display = 'inline';
     customCursor.background = 'white';
     cursorX = x;
@@ -576,24 +582,19 @@ function showFinishedHash(hash){
     frame.appendChild(container);
 }
 
-function createRect() {
-    targetElement = document.createElement('targetElement');
-    targetElement.id = "rect1";
-    targetElement.name = "rectangleRed";
-    targetWidth = 150;
-    targetHeight = 50;
-    targetElement.style.width = targetWidth + 'px';
-    targetElement.style.height = targetHeight + 'px';
-    targetElement.style.background = "red";
-    targetElement.style.position = 'absolute';
-    targetElement.style.display = 'inline';
-    newX = getRndInteger(0, parseInt(frame.style.width) - parseInt(targetElement.style.width));
-    newY = getRndInteger(0, parseInt(frame.style.height) - parseInt(targetElement.style.height));
+function createTargetCircle(newX, newY){
+    targetElement = document.createElement('img');
+    targetElement.src = "/res/circle100x100.png";
+    targetElement.id = "targetCircle";
+    targetElement.style.width = circleCanvasSize[0] + "px";
+    targetElement.style.height = circleCanvasSize[1] + "px";
     targetElement.style.left = newX + "px";
     targetElement.style.top = newY + "px";
-    targetElement.style.transition = '0.1s';
+    targetElement.style.position = 'absolute';
+    targetElement.style.display = 'inline';
     frame.appendChild(targetElement);
 }
+
 
 function setupNewScene() {
     run_id = run_id + 1;
@@ -603,19 +604,17 @@ function setupNewScene() {
         conditionsCompleted++;
         condition_id = conditionsList[conditionsCompleted];
         run_id = 0;
-        updateCurrentLevelText()
+        updateCurrentLevelText();
         setConfigurationParameters();
     }
 
     removeElement(targetElement.id);
-    removeElement(customCursor.id);
-    createRect();
-    let newCursorCoords = getNewCursorCoordinates(document.getElementById("rect1"));
-    createCustomCursor(newCursorCoords[0], newCursorCoords[1]);
+    let newTargetCoords = getNewTargetCoordinates(customCursor);
+    createTargetCircle(newTargetCoords[0], newTargetCoords[1]);
+    
     cursorInside = false;
-
     timestampConditionStart = performance.now();
-    logAllData(timestampConditionStart,false)
+    logAllData(timestampConditionStart,false);
 }
 
 function removeElement(elementId) {
@@ -623,14 +622,13 @@ function removeElement(elementId) {
     element.parentNode.removeChild(element);
 }
 
-
 //Functions to calculate coordinates
-function getNewCursorCoordinates(elementToSpawnAround) {
-    let centerX = parseInt(elementToSpawnAround.style.left) - parseInt(customCursor.style.width) / 2 + parseInt(elementToSpawnAround.style.width) / 2,
-        centerY = parseInt(elementToSpawnAround.style.top) - parseInt(customCursor.style.height) / 2 + parseInt(elementToSpawnAround.style.height) / 2,
-        cursorStartX = centerX + 300,
-        cursorStartY = centerY,
-        coords = rotateAroundCenter(centerX, centerY, cursorStartX, cursorStartY);
+function getNewTargetCoordinates(elementToSpawnAround) {
+    let centerX = parseInt(elementToSpawnAround.style.left),
+        centerY = parseInt(elementToSpawnAround.style.top),
+        targetStartX = centerX + 300,
+        targetStartY = centerY,
+        coords = rotateAroundCenter(centerX, centerY, targetStartX, targetStartY);
     return coords;
 }
 
@@ -639,15 +637,13 @@ function rotateAroundCenter(centerX, centerY, objectToRotateX, objectToRotateY) 
         rad = degreesToRadians(getRndInteger(0, 360)),
         sin = Math.sin(rad),
         cos = Math.cos(rad);
-
     rotatedCoords[0] = cos * (objectToRotateX - centerX) - sin * (objectToRotateY - centerY) + centerX;
     rotatedCoords[1] = sin * (objectToRotateX - centerX) - cos * (objectToRotateY - centerY) + centerY;
 
-    //Recalculate, if new coordinates are not on canvas
-    while (rotatedCoords[0] > parseInt(frame.style.width) || rotatedCoords[0] < 0 || rotatedCoords[1] > parseInt(frame.style.height) || rotatedCoords[1] < 0) {
+    //Recalculate, if new coordinates are not on targetElement
+    while (rotatedCoords[0] + 100 > parseInt(frame.style.width) || rotatedCoords[0] < 0 || rotatedCoords[1] + 100 > parseInt(frame.style.height) || rotatedCoords[1] < 0) {
         rotatedCoords = rotateAroundCenter(centerX, centerY, objectToRotateX, objectToRotateY);
     }
-
     return rotatedCoords;
 }
 
@@ -683,6 +679,7 @@ function logAllData(timestamp, isClick) {
             cursorY;
         csvQueue.push(logString);
     }
+
 }
 
 async function sendCsvContentToServer(){
@@ -798,17 +795,12 @@ function limitNumberWithinRange(num, min, max) {
     return Math.min(Math.max(parsed, MIN), MAX);
 }
 
-function cursorIsInsideOfElement(elementToCheck) {
-    cursor = document.getElementById("customCursor");
-
-    let targetHeightCurrent = parseInt(elementToCheck.style.height),
-        targetWidthCurrent = parseInt(elementToCheck.style.width);
-
-    if ((cursorX > newX && cursorY > newY) && (cursorX < newX + targetWidthCurrent && cursorY < newY + targetHeightCurrent)) {
-        return true;
-    } else {
-        return false;
-    }
+function cursorIsInsideOfElement(){
+    isInside = Math.sqrt(
+        Math.pow((cursorX - parseInt(targetElement.style.left) - circleRadius), 2) + 
+        Math.pow((cursorY - parseInt(targetElement.style.top) - circleRadius), 2)
+      ) < circleRadius;
+    return isInside;
 }
 
 function getUniqueBrowserID() {
