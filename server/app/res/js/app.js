@@ -686,7 +686,7 @@ async function sendCsvContentToServer(){
     //Number of log entries to be recorded
     if ((run_id % 5 == 0) && run_id != 0) {  
         fillCsvContentWithQueue();
-        post(csvContent);
+        post(csvContent, pid);
     }
 }
 
@@ -702,7 +702,7 @@ function removeStartScreeen() {
     $('#inputForm').remove();
 }
 
-async function post(logData) {
+async function post(logData, currentPID) {
     if (!hasAlreadyParticipated) {
         $.ajax({
             url: "http://localhost:7000/log/",
@@ -713,11 +713,12 @@ async function post(logData) {
             dataType: "text",
             async: true,
             success: function (response) {
-                if(response == 200){
+                if(response == 200 && currentPID == pid){
                     csvContent = "";
-                }  
+                }
             },
             error: function (response) {
+
             }
         });
     } else{
