@@ -883,11 +883,11 @@ function setLanguageStrings(){
         levelsCompleted = "All levels completed";
         formAgeString = "Age";
         formGenderString = "Gender";
-        formJobString = "Job";
+        formJobString = "Occupation";
         formGenderChoices = ["Female", "Male", "Diverse"];
         formStartTestButtonString = "Start test";
         finishedHeaderString = "Thank you for participating <3";
-        finishedExplainString = "If you are a student at the University of Regensburg, please send this code to marie.sautmann@stud.uni-regensburg.de in order to recieve your VP:";
+        finishedExplainString = "If you are a student at the University of Regensburg, please send this code to marie.sautmann@stud.uni-regensburg.de in order to receive your VP credits:";
         introTextSetupRules = "\nBefore you start:\n- Make sure you are using a laptop or desktop pc\n- Resize your browser window so that the entire black background area can be seen\n- Make sure your browser zoom is at exactly 100%, don't zoom in or out";
     } else{
         levelOf = " von ";
