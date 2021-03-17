@@ -397,7 +397,7 @@ function createButton(form, nameOfButton) {
     var btn = document.createElement("BUTTON");
     btn.type = "button";
     btn.innerHTML = nameOfButton;
-    btn.style.id = nameOfButton;
+    btn.id = nameOfButton;
     btn.style.marginTop = 25 + "px";
     btn.onclick = getPID;
     form.appendChild(btn);
@@ -428,6 +428,9 @@ function createDataListInput(form){
 
 function getPID() {
     if (!isMobileDevice()){
+        button = document.getElementById(formStartTestButtonString);
+        button.disabled = "true";
+        button.textContent = formStartTestButtonLoadingText;
         let formCsvDataWithUniqueID = getCsvDataFromForm() + "," + getUniqueBrowserID() + "," + getOS();
         getPidCall(formCsvDataWithUniqueID);
     } else{
@@ -752,6 +755,11 @@ function getPidCall(formCsvData) {
             startScreenIsActive = false;
             setupScene();
             requestLock();
+        },
+        error: function () {
+            setTimeout(function () {
+                getPidCall(formCsvData);
+            }, 2500)
         }
     });
 
@@ -882,6 +890,7 @@ function setLanguageStrings(){
         finishedHeaderString = "Thank you for participating <3";
         finishedExplainString = "If you are a student at the University of Regensburg, please send this code to marie.sautmann@stud.uni-regensburg.de in order to receive your VP credits:";
         introTextSetupRules = "\nBefore you start:\n- Make sure you are using a laptop or desktop pc\n- Resize your browser window so that the entire black background area can be seen\n- Make sure your browser zoom is at exactly 100%, don't zoom in or out";
+        formStartTestButtonLoadingText = "Preparing study...";
     } else{
         levelOf = " von ";
         levelsCompleted = "Alle Level vollendet";
@@ -893,6 +902,7 @@ function setLanguageStrings(){
         finishedHeaderString = "Vielen Dank für Ihre Teilnahme <3";
         finishedExplainString = "Wenn Sie ein(e) Student(in) der Universität Regensburg sind, dann schicken Sie bitte folgenden Code an marie.sautmann@stud.uni-regensburg.de um Ihre Versuchspersonenstunden zu erhalten:";
         introTextSetupRules = "\nBevor Sie die Studie starten:\n- Wechseln Sie zu einem Laptop oder Desktop Pc\n- Passen Sie das Browser Fenster so an, dass die komplette schwarze Hintergrundfläche zu sehen ist\n- Setzen Sie ihren Browser Zoom auf genau 100%, zoomen Sie nicht hinein oder heraus";
+        formStartTestButtonLoadingText = "Lade Experiment...";
     } 
 }
 
@@ -905,7 +915,8 @@ formGenderChoices,
 formStartTestButtonString,
 finishedHeaderString,
 finishedExplainString,
-introTextSetupRules;
+introTextSetupRules,
+formStartTestButtonLoadingText;
 
 
 // PX to cm stuff
