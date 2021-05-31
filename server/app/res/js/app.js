@@ -1,8 +1,8 @@
 /* jshint esversion: 6 */
 
-//One Chunk equals 10 runs
-let NUMBER_OF_CHUNKS_TO_BE_SENT = 20;
-let NUMBER_OF_WARMUP_CHUNKS_TO_BE_SENT = 10;
+//One Chunk equals 5 runs
+let NUMBER_OF_CHUNKS_TO_BE_SENT = 100;
+let NUMBER_OF_WARMUP_CHUNKS_TO_BE_SENT = 0;
 
 let timeAtLastSuccessfulClick,
     frame = document.getElementById('frame'),
@@ -77,14 +77,6 @@ function setupStartScreen() {
 
 function setConfigurationParameters() {
     switch (condition_id) {
-        case -1:
-            warmupModeIsOn = true;
-            nrOfChunksToSend = NUMBER_OF_WARMUP_CHUNKS_TO_BE_SENT;
-            UI_SPEED_X = 0;
-            UI_SPEED_Y = 0;
-            CURSOR_SPEED_X = 1;
-            CURSOR_SPEED_Y = 1;
-            break;
         case 0:
             warmupModeIsOn = false;
             nrOfChunksToSend = NUMBER_OF_CHUNKS_TO_BE_SENT;
@@ -96,52 +88,28 @@ function setConfigurationParameters() {
         case 1:
             warmupModeIsOn = false;
             nrOfChunksToSend = NUMBER_OF_CHUNKS_TO_BE_SENT;
-            UI_SPEED_X = 0.25;
-            UI_SPEED_Y = 0.25;
+            UI_SPEED_X = 0;
+            UI_SPEED_Y = 0;
             CURSOR_SPEED_X = 1;
             CURSOR_SPEED_Y = 1;
             break;
         case 2:
             warmupModeIsOn = false;
             nrOfChunksToSend = NUMBER_OF_CHUNKS_TO_BE_SENT;
-            UI_SPEED_X = 0.5;
-            UI_SPEED_Y = 0.5;
+            UI_SPEED_X = 0;
+            UI_SPEED_Y = 0;
             CURSOR_SPEED_X = 1;
             CURSOR_SPEED_Y = 1;
             break;
         case 3:
             warmupModeIsOn = false;
             nrOfChunksToSend = NUMBER_OF_CHUNKS_TO_BE_SENT;
-            UI_SPEED_X = 0.75;
-            UI_SPEED_Y = 0.75;
+            UI_SPEED_X = 0;
+            UI_SPEED_Y = 0;
             CURSOR_SPEED_X = 1;
             CURSOR_SPEED_Y = 1;
             break;
         case 4:
-            warmupModeIsOn = false;
-            nrOfChunksToSend = NUMBER_OF_CHUNKS_TO_BE_SENT;
-            UI_SPEED_X = 1;
-            UI_SPEED_Y = 1;
-            CURSOR_SPEED_X = 1;
-            CURSOR_SPEED_Y = 1;
-            break;
-        case 5:
-            warmupModeIsOn = false;
-            nrOfChunksToSend = NUMBER_OF_CHUNKS_TO_BE_SENT;
-            UI_SPEED_X = 0;
-            UI_SPEED_Y = 0;
-            CURSOR_SPEED_X = 1.5;
-            CURSOR_SPEED_Y = 1.5;
-            break;
-        case 6:
-            warmupModeIsOn = true;
-            nrOfChunksToSend = NUMBER_OF_WARMUP_CHUNKS_TO_BE_SENT;
-            UI_SPEED_X = 0;
-            UI_SPEED_Y = 0;
-            CURSOR_SPEED_X = 1;
-            CURSOR_SPEED_Y = 1;
-            break;
-        case 7:
             postRunsComplete();
             break;
     }
@@ -252,6 +220,10 @@ function createFrame() {
     frame.style.width = 1000 + 'px';
     frame.style.height = 750 + 'px';
     frame.style.background = "black";
+    frame.style.marginLeft = "auto";
+    frame.style.marginRight = "auto";
+    frame.style.marginTop = "auto";
+    frame.style.marginBottom = "auto";
     frame.style.position = 'fixed';
     frame.style.display = 'inline';
     frame.style.top  = 50 + "%";
@@ -600,6 +572,7 @@ function createTargetCircle(newX, newY){
 
 
 function setupNewScene() {
+    let isNewCondition = false;
     run_id = run_id + 1;
 
     if (run_id % (nrOfChunksToSend * 5 + 1) == 0 && run_id != 0){
@@ -607,14 +580,86 @@ function setupNewScene() {
         conditionsCompleted++;
         condition_id = conditionsList[conditionsCompleted];
         run_id = 0;
-        updateCurrentLevelText();
         setConfigurationParameters();
+
+        if (condition_id != 4) {
+            updateCurrentLevelText();
+            startScreenIsActive = true;
+            isNewCondition = true;
+            startTimer();
+        }
     }
 
     removeElement(targetElement.id);
+    if (!isNewCondition) {
+        drawNewScene();
+    }
+}
+
+function startTimer() {
+    this.timer = setInterval(function(){ onTimerTick() }, 1000);
+    this.timerSecondsCounted = 0
+    showPauseMenu()
+}
+
+function onTimerTick() {
+    this.timerSecondsCounted += 1;
+
+    let remainingSeconds = 5 * 60 - this.timerSecondsCounted,
+    remainingMinutes = Math.floor(remainingSeconds / 60);
+    this.pHash.firstChild.nodeValue = remainingMinutes.toString() + ":" + (remainingSeconds%60).toString();
+    if (this.timerSecondsCounted == 5*60) {
+        clearInterval(this.timer);
+        showContinueButton()
+    }
+}
+
+function showContinueButton() {
+    var continueButton = document.createElement("button");
+    continueButton.style.background = "#00cc66";
+    continueButton.style.margin = 15 + "px";
+    continueButton.style.padding = 10 + "px";
+    continueButton.style.left = 50 + "%";
+    continueButton.style.top = 50 + "%";
+    continueButton.textContent = "Continue";
+    continueButton.onclick = function() {
+        document.getElementById("textContainerPauseMenu").remove();
+        startScreenIsActive = false;
+        drawNewScene();
+    };
+    this.textContainerPauseMenu.appendChild(continueButton);
+}
+
+function showPauseMenu() {
+    this.textContainerPauseMenu = document.createElement("div");
+    this.textContainerPauseMenu.id = "textContainerPauseMenu"
+    this.textContainerPauseMenu.style.marginLeft = "auto";
+    this.textContainerPauseMenu.style.marginRight = "auto";
+    this.textContainerPauseMenu.style.background = "Gainsboro";
+    this.textContainerPauseMenu.style.textAlign = "center";
+    this.textContainerPauseMenu.style.width = 60 + "%";
+    this.textContainerPauseMenu.style.padding = 10 + "px";
+
+    this.pHash = document.createElement("h3");
+    this.pHash.style.textAlign = "center";
+    this.pHash.style.background = "#ff6961";
+    this.pHash.style.width = 250 + "px";
+    this.pHash.style.marginLeft = "auto";
+    this.pHash.style.marginRight = "auto";
+
+    this.pHashText = document.createTextNode("5:00"); 
+    this.pHash.style.color = "black";
+    this.pHash.appendChild(this.pHashText);
+    this.textContainerPauseMenu.appendChild(this.pHash);
+
+    frame.appendChild(this.textContainerPauseMenu);
+}
+
+function drawNewScene(){
     let newTargetCoords = getNewTargetCoordinates(customCursor);
-    createTargetCircle(newTargetCoords[0], newTargetCoords[1]);
-    
+    newX = newTargetCoords[0];
+    newY = newTargetCoords[1];
+    createTargetCircle(newX, newY);
     cursorInside = false;
     timestampConditionStart = performance.now();
     logAllData(timestampConditionStart,false);
@@ -856,26 +901,7 @@ function isMobileDevice() {
 }
 
   function setConditionsList() {
-    switch (pid%6){
-        case 0:
-            conditionsList = [-1,0,1,5,2,4,3,6,7];
-            break;
-        case 1:
-            conditionsList = [-1,1,2,0,3,5,4,6,7];
-            break;
-        case 2:
-            conditionsList = [-1,2,3,1,4,0,5,6,7];
-            break;
-        case 3:
-            conditionsList = [-1,3,4,2,5,1,0,6,7];
-            break;
-        case 4:
-            conditionsList = [-1,4,5,3,0,2,1,6,7];
-            break;
-        case 5:
-            conditionsList = [-1,5,0,4,1,3,2,6,7];
-            break;
-    }
+    conditionsList = [0, 1, 2, 3, 4];
   }
 
 function setLanguageStrings(){
