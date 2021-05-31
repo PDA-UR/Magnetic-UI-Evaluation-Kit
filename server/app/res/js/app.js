@@ -607,7 +607,13 @@ function onTimerTick() {
 
     let remainingSeconds = 5 * 60 - this.timerSecondsCounted,
     remainingMinutes = Math.floor(remainingSeconds / 60);
-    this.pHash.firstChild.nodeValue = remainingMinutes.toString() + ":" + (remainingSeconds%60).toString();
+
+    let secString = (remainingSeconds%60).toString(),
+    minString = remainingMinutes.toString();
+    if (parseInt(secString) < 10) secString = "0" + secString;
+    if (parseInt(minString) < 10) minString = "0" + minString;
+
+    this.pHash.firstChild.nodeValue = minString + ":" + secString;
     if (this.timerSecondsCounted == 5*60) {
         clearInterval(this.timer);
         showContinueButton()
