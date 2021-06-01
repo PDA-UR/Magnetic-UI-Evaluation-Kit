@@ -80,32 +80,32 @@ function setConfigurationParameters() {
         case 0:
             warmupModeIsOn = false;
             nrOfChunksToSend = NUMBER_OF_CHUNKS_TO_BE_SENT;
-            UI_SPEED_X = 0;
-            UI_SPEED_Y = 0;
+            UI_SPEED_X = 1;
+            UI_SPEED_Y = 1;
             CURSOR_SPEED_X = 1;
             CURSOR_SPEED_Y = 1;
             break;
         case 1:
             warmupModeIsOn = false;
             nrOfChunksToSend = NUMBER_OF_CHUNKS_TO_BE_SENT;
-            UI_SPEED_X = 0;
-            UI_SPEED_Y = 0;
+            UI_SPEED_X = 1;
+            UI_SPEED_Y = 1;
             CURSOR_SPEED_X = 1;
             CURSOR_SPEED_Y = 1;
             break;
         case 2:
             warmupModeIsOn = false;
             nrOfChunksToSend = NUMBER_OF_CHUNKS_TO_BE_SENT;
-            UI_SPEED_X = 0;
-            UI_SPEED_Y = 0;
+            UI_SPEED_X = 1;
+            UI_SPEED_Y = 1;
             CURSOR_SPEED_X = 1;
             CURSOR_SPEED_Y = 1;
             break;
         case 3:
             warmupModeIsOn = false;
             nrOfChunksToSend = NUMBER_OF_CHUNKS_TO_BE_SENT;
-            UI_SPEED_X = 0;
-            UI_SPEED_Y = 0;
+            UI_SPEED_X = 1;
+            UI_SPEED_Y = 1;
             CURSOR_SPEED_X = 1;
             CURSOR_SPEED_Y = 1;
             break;
